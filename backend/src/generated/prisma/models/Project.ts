@@ -28,6 +28,7 @@ export type ProjectMinAggregateOutputType = {
   id: string | null
   title: string | null
   createdAt: Date | null
+  updatedAt: Date | null
   ownerId: string | null
 }
 
@@ -35,6 +36,7 @@ export type ProjectMaxAggregateOutputType = {
   id: string | null
   title: string | null
   createdAt: Date | null
+  updatedAt: Date | null
   ownerId: string | null
 }
 
@@ -42,6 +44,7 @@ export type ProjectCountAggregateOutputType = {
   id: number
   title: number
   createdAt: number
+  updatedAt: number
   ownerId: number
   _all: number
 }
@@ -51,6 +54,7 @@ export type ProjectMinAggregateInputType = {
   id?: true
   title?: true
   createdAt?: true
+  updatedAt?: true
   ownerId?: true
 }
 
@@ -58,6 +62,7 @@ export type ProjectMaxAggregateInputType = {
   id?: true
   title?: true
   createdAt?: true
+  updatedAt?: true
   ownerId?: true
 }
 
@@ -65,6 +70,7 @@ export type ProjectCountAggregateInputType = {
   id?: true
   title?: true
   createdAt?: true
+  updatedAt?: true
   ownerId?: true
   _all?: true
 }
@@ -145,6 +151,7 @@ export type ProjectGroupByOutputType = {
   id: string
   title: string
   createdAt: Date
+  updatedAt: Date | null
   ownerId: string
   _count: ProjectCountAggregateOutputType | null
   _min: ProjectMinAggregateOutputType | null
@@ -173,6 +180,7 @@ export type ProjectWhereInput = {
   id?: Prisma.StringFilter<"Project"> | string
   title?: Prisma.StringFilter<"Project"> | string
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   ownerId?: Prisma.StringFilter<"Project"> | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   todos?: Prisma.TodoListRelationFilter
@@ -183,6 +191,7 @@ export type ProjectOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   owner?: Prisma.UserOrderByWithRelationInput
   todos?: Prisma.TodoOrderByRelationAggregateInput
@@ -196,6 +205,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ProjectWhereInput | Prisma.ProjectWhereInput[]
   title?: Prisma.StringFilter<"Project"> | string
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   ownerId?: Prisma.StringFilter<"Project"> | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   todos?: Prisma.TodoListRelationFilter
@@ -206,6 +216,7 @@ export type ProjectOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   _count?: Prisma.ProjectCountOrderByAggregateInput
   _max?: Prisma.ProjectMaxOrderByAggregateInput
@@ -219,6 +230,7 @@ export type ProjectScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Project"> | string
   title?: Prisma.StringWithAggregatesFilter<"Project"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
   ownerId?: Prisma.StringWithAggregatesFilter<"Project"> | string
 }
 
@@ -226,6 +238,7 @@ export type ProjectCreateInput = {
   id?: string
   title: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutOwnedProjectsInput
   todos?: Prisma.TodoCreateNestedManyWithoutProjectInput
   collaborators?: Prisma.CollaboratorCreateNestedManyWithoutProjectInput
@@ -235,6 +248,7 @@ export type ProjectUncheckedCreateInput = {
   id?: string
   title: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   ownerId: string
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutProjectInput
   collaborators?: Prisma.CollaboratorUncheckedCreateNestedManyWithoutProjectInput
@@ -244,6 +258,7 @@ export type ProjectUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedProjectsNestedInput
   todos?: Prisma.TodoUpdateManyWithoutProjectNestedInput
   collaborators?: Prisma.CollaboratorUpdateManyWithoutProjectNestedInput
@@ -253,6 +268,7 @@ export type ProjectUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   todos?: Prisma.TodoUncheckedUpdateManyWithoutProjectNestedInput
   collaborators?: Prisma.CollaboratorUncheckedUpdateManyWithoutProjectNestedInput
@@ -262,6 +278,7 @@ export type ProjectCreateManyInput = {
   id?: string
   title: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   ownerId: string
 }
 
@@ -269,12 +286,14 @@ export type ProjectUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProjectUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -292,6 +311,7 @@ export type ProjectCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
 }
 
@@ -299,6 +319,7 @@ export type ProjectMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
 }
 
@@ -306,6 +327,7 @@ export type ProjectMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
 }
 
@@ -388,6 +410,7 @@ export type ProjectCreateWithoutOwnerInput = {
   id?: string
   title: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   todos?: Prisma.TodoCreateNestedManyWithoutProjectInput
   collaborators?: Prisma.CollaboratorCreateNestedManyWithoutProjectInput
 }
@@ -396,6 +419,7 @@ export type ProjectUncheckedCreateWithoutOwnerInput = {
   id?: string
   title: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutProjectInput
   collaborators?: Prisma.CollaboratorUncheckedCreateNestedManyWithoutProjectInput
 }
@@ -433,6 +457,7 @@ export type ProjectScalarWhereInput = {
   id?: Prisma.StringFilter<"Project"> | string
   title?: Prisma.StringFilter<"Project"> | string
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   ownerId?: Prisma.StringFilter<"Project"> | string
 }
 
@@ -440,6 +465,7 @@ export type ProjectCreateWithoutCollaboratorsInput = {
   id?: string
   title: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutOwnedProjectsInput
   todos?: Prisma.TodoCreateNestedManyWithoutProjectInput
 }
@@ -448,6 +474,7 @@ export type ProjectUncheckedCreateWithoutCollaboratorsInput = {
   id?: string
   title: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   ownerId: string
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutProjectInput
 }
@@ -472,6 +499,7 @@ export type ProjectUpdateWithoutCollaboratorsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedProjectsNestedInput
   todos?: Prisma.TodoUpdateManyWithoutProjectNestedInput
 }
@@ -480,6 +508,7 @@ export type ProjectUncheckedUpdateWithoutCollaboratorsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   todos?: Prisma.TodoUncheckedUpdateManyWithoutProjectNestedInput
 }
@@ -488,6 +517,7 @@ export type ProjectCreateWithoutTodosInput = {
   id?: string
   title: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutOwnedProjectsInput
   collaborators?: Prisma.CollaboratorCreateNestedManyWithoutProjectInput
 }
@@ -496,6 +526,7 @@ export type ProjectUncheckedCreateWithoutTodosInput = {
   id?: string
   title: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   ownerId: string
   collaborators?: Prisma.CollaboratorUncheckedCreateNestedManyWithoutProjectInput
 }
@@ -520,6 +551,7 @@ export type ProjectUpdateWithoutTodosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedProjectsNestedInput
   collaborators?: Prisma.CollaboratorUpdateManyWithoutProjectNestedInput
 }
@@ -528,6 +560,7 @@ export type ProjectUncheckedUpdateWithoutTodosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   collaborators?: Prisma.CollaboratorUncheckedUpdateManyWithoutProjectNestedInput
 }
@@ -536,12 +569,14 @@ export type ProjectCreateManyOwnerInput = {
   id?: string
   title: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
 }
 
 export type ProjectUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   todos?: Prisma.TodoUpdateManyWithoutProjectNestedInput
   collaborators?: Prisma.CollaboratorUpdateManyWithoutProjectNestedInput
 }
@@ -550,6 +585,7 @@ export type ProjectUncheckedUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   todos?: Prisma.TodoUncheckedUpdateManyWithoutProjectNestedInput
   collaborators?: Prisma.CollaboratorUncheckedUpdateManyWithoutProjectNestedInput
 }
@@ -558,6 +594,7 @@ export type ProjectUncheckedUpdateManyWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -604,6 +641,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   title?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   ownerId?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   todos?: boolean | Prisma.Project$todosArgs<ExtArgs>
@@ -615,6 +653,7 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   title?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   ownerId?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
@@ -623,6 +662,7 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   title?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   ownerId?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
@@ -631,10 +671,11 @@ export type ProjectSelectScalar = {
   id?: boolean
   title?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   ownerId?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "createdAt" | "ownerId", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   todos?: boolean | Prisma.Project$todosArgs<ExtArgs>
@@ -659,6 +700,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: string
     title: string
     createdAt: Date
+    updatedAt: Date | null
     ownerId: string
   }, ExtArgs["result"]["project"]>
   composites: {}
@@ -1089,6 +1131,7 @@ export interface ProjectFieldRefs {
   readonly id: Prisma.FieldRef<"Project", 'String'>
   readonly title: Prisma.FieldRef<"Project", 'String'>
   readonly createdAt: Prisma.FieldRef<"Project", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"Project", 'DateTime'>
   readonly ownerId: Prisma.FieldRef<"Project", 'String'>
 }
     

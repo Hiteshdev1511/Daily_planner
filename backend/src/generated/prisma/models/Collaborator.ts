@@ -26,16 +26,18 @@ export type AggregateCollaborator = {
 
 export type CollaboratorMinAggregateOutputType = {
   id: string | null
-  role: string | null
+  role: $Enums.Role | null
   createdAt: Date | null
+  updatedAt: Date | null
   userId: string | null
   projectId: string | null
 }
 
 export type CollaboratorMaxAggregateOutputType = {
   id: string | null
-  role: string | null
+  role: $Enums.Role | null
   createdAt: Date | null
+  updatedAt: Date | null
   userId: string | null
   projectId: string | null
 }
@@ -44,6 +46,7 @@ export type CollaboratorCountAggregateOutputType = {
   id: number
   role: number
   createdAt: number
+  updatedAt: number
   userId: number
   projectId: number
   _all: number
@@ -54,6 +57,7 @@ export type CollaboratorMinAggregateInputType = {
   id?: true
   role?: true
   createdAt?: true
+  updatedAt?: true
   userId?: true
   projectId?: true
 }
@@ -62,6 +66,7 @@ export type CollaboratorMaxAggregateInputType = {
   id?: true
   role?: true
   createdAt?: true
+  updatedAt?: true
   userId?: true
   projectId?: true
 }
@@ -70,6 +75,7 @@ export type CollaboratorCountAggregateInputType = {
   id?: true
   role?: true
   createdAt?: true
+  updatedAt?: true
   userId?: true
   projectId?: true
   _all?: true
@@ -149,8 +155,9 @@ export type CollaboratorGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 
 export type CollaboratorGroupByOutputType = {
   id: string
-  role: string
+  role: $Enums.Role
   createdAt: Date
+  updatedAt: Date | null
   userId: string
   projectId: string
   _count: CollaboratorCountAggregateOutputType | null
@@ -178,8 +185,9 @@ export type CollaboratorWhereInput = {
   OR?: Prisma.CollaboratorWhereInput[]
   NOT?: Prisma.CollaboratorWhereInput | Prisma.CollaboratorWhereInput[]
   id?: Prisma.StringFilter<"Collaborator"> | string
-  role?: Prisma.StringFilter<"Collaborator"> | string
+  role?: Prisma.EnumRoleFilter<"Collaborator"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"Collaborator"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"Collaborator"> | Date | string | null
   userId?: Prisma.StringFilter<"Collaborator"> | string
   projectId?: Prisma.StringFilter<"Collaborator"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -190,6 +198,7 @@ export type CollaboratorOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -202,8 +211,9 @@ export type CollaboratorWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.CollaboratorWhereInput | Prisma.CollaboratorWhereInput[]
   OR?: Prisma.CollaboratorWhereInput[]
   NOT?: Prisma.CollaboratorWhereInput | Prisma.CollaboratorWhereInput[]
-  role?: Prisma.StringFilter<"Collaborator"> | string
+  role?: Prisma.EnumRoleFilter<"Collaborator"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"Collaborator"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"Collaborator"> | Date | string | null
   userId?: Prisma.StringFilter<"Collaborator"> | string
   projectId?: Prisma.StringFilter<"Collaborator"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -214,6 +224,7 @@ export type CollaboratorOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   _count?: Prisma.CollaboratorCountOrderByAggregateInput
@@ -226,62 +237,70 @@ export type CollaboratorScalarWhereWithAggregatesInput = {
   OR?: Prisma.CollaboratorScalarWhereWithAggregatesInput[]
   NOT?: Prisma.CollaboratorScalarWhereWithAggregatesInput | Prisma.CollaboratorScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Collaborator"> | string
-  role?: Prisma.StringWithAggregatesFilter<"Collaborator"> | string
+  role?: Prisma.EnumRoleWithAggregatesFilter<"Collaborator"> | $Enums.Role
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Collaborator"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Collaborator"> | Date | string | null
   userId?: Prisma.StringWithAggregatesFilter<"Collaborator"> | string
   projectId?: Prisma.StringWithAggregatesFilter<"Collaborator"> | string
 }
 
 export type CollaboratorCreateInput = {
   id?: string
-  role: string
+  role?: $Enums.Role
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutCollaborationsInput
   project: Prisma.ProjectCreateNestedOneWithoutCollaboratorsInput
 }
 
 export type CollaboratorUncheckedCreateInput = {
   id?: string
-  role: string
+  role?: $Enums.Role
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   userId: string
   projectId: string
 }
 
 export type CollaboratorUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutCollaborationsNestedInput
   project?: Prisma.ProjectUpdateOneRequiredWithoutCollaboratorsNestedInput
 }
 
 export type CollaboratorUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CollaboratorCreateManyInput = {
   id?: string
-  role: string
+  role?: $Enums.Role
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   userId: string
   projectId: string
 }
 
 export type CollaboratorUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type CollaboratorUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -305,6 +324,7 @@ export type CollaboratorCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
 }
@@ -313,6 +333,7 @@ export type CollaboratorMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
 }
@@ -321,6 +342,7 @@ export type CollaboratorMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
 }
@@ -409,17 +431,23 @@ export type CollaboratorUncheckedUpdateManyWithoutProjectNestedInput = {
   deleteMany?: Prisma.CollaboratorScalarWhereInput | Prisma.CollaboratorScalarWhereInput[]
 }
 
+export type EnumRoleFieldUpdateOperationsInput = {
+  set?: $Enums.Role
+}
+
 export type CollaboratorCreateWithoutUserInput = {
   id?: string
-  role: string
+  role?: $Enums.Role
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   project: Prisma.ProjectCreateNestedOneWithoutCollaboratorsInput
 }
 
 export type CollaboratorUncheckedCreateWithoutUserInput = {
   id?: string
-  role: string
+  role?: $Enums.Role
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   projectId: string
 }
 
@@ -454,23 +482,26 @@ export type CollaboratorScalarWhereInput = {
   OR?: Prisma.CollaboratorScalarWhereInput[]
   NOT?: Prisma.CollaboratorScalarWhereInput | Prisma.CollaboratorScalarWhereInput[]
   id?: Prisma.StringFilter<"Collaborator"> | string
-  role?: Prisma.StringFilter<"Collaborator"> | string
+  role?: Prisma.EnumRoleFilter<"Collaborator"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"Collaborator"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"Collaborator"> | Date | string | null
   userId?: Prisma.StringFilter<"Collaborator"> | string
   projectId?: Prisma.StringFilter<"Collaborator"> | string
 }
 
 export type CollaboratorCreateWithoutProjectInput = {
   id?: string
-  role: string
+  role?: $Enums.Role
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutCollaborationsInput
 }
 
 export type CollaboratorUncheckedCreateWithoutProjectInput = {
   id?: string
-  role: string
+  role?: $Enums.Role
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   userId: string
 }
 
@@ -502,57 +533,65 @@ export type CollaboratorUpdateManyWithWhereWithoutProjectInput = {
 
 export type CollaboratorCreateManyUserInput = {
   id?: string
-  role: string
+  role?: $Enums.Role
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   projectId: string
 }
 
 export type CollaboratorUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   project?: Prisma.ProjectUpdateOneRequiredWithoutCollaboratorsNestedInput
 }
 
 export type CollaboratorUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CollaboratorUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CollaboratorCreateManyProjectInput = {
   id?: string
-  role: string
+  role?: $Enums.Role
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   userId: string
 }
 
 export type CollaboratorUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutCollaborationsNestedInput
 }
 
 export type CollaboratorUncheckedUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CollaboratorUncheckedUpdateManyWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -562,6 +601,7 @@ export type CollaboratorSelect<ExtArgs extends runtime.Types.Extensions.Internal
   id?: boolean
   role?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   userId?: boolean
   projectId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -572,6 +612,7 @@ export type CollaboratorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   role?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   userId?: boolean
   projectId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -582,6 +623,7 @@ export type CollaboratorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   role?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   userId?: boolean
   projectId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -592,11 +634,12 @@ export type CollaboratorSelectScalar = {
   id?: boolean
   role?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   userId?: boolean
   projectId?: boolean
 }
 
-export type CollaboratorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "createdAt" | "userId" | "projectId", ExtArgs["result"]["collaborator"]>
+export type CollaboratorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "createdAt" | "updatedAt" | "userId" | "projectId", ExtArgs["result"]["collaborator"]>
 export type CollaboratorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
@@ -618,8 +661,9 @@ export type $CollaboratorPayload<ExtArgs extends runtime.Types.Extensions.Intern
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    role: string
+    role: $Enums.Role
     createdAt: Date
+    updatedAt: Date | null
     userId: string
     projectId: string
   }, ExtArgs["result"]["collaborator"]>
@@ -1048,8 +1092,9 @@ export interface Prisma__CollaboratorClient<T, Null = never, ExtArgs extends run
  */
 export interface CollaboratorFieldRefs {
   readonly id: Prisma.FieldRef<"Collaborator", 'String'>
-  readonly role: Prisma.FieldRef<"Collaborator", 'String'>
+  readonly role: Prisma.FieldRef<"Collaborator", 'Role'>
   readonly createdAt: Prisma.FieldRef<"Collaborator", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"Collaborator", 'DateTime'>
   readonly userId: Prisma.FieldRef<"Collaborator", 'String'>
   readonly projectId: Prisma.FieldRef<"Collaborator", 'String'>
 }

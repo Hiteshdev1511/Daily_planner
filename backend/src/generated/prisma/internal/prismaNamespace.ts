@@ -823,7 +823,8 @@ export const PersonScalarFieldEnum = {
   lastname: 'lastname',
   dob: 'dob',
   gender: 'gender',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type PersonScalarFieldEnum = (typeof PersonScalarFieldEnum)[keyof typeof PersonScalarFieldEnum]
@@ -836,6 +837,7 @@ export const UserScalarFieldEnum = {
   password: 'password',
   refreshToken: 'refreshToken',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   personId: 'personId'
 } as const
 
@@ -846,6 +848,7 @@ export const ProjectScalarFieldEnum = {
   id: 'id',
   title: 'title',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   ownerId: 'ownerId'
 } as const
 
@@ -856,6 +859,7 @@ export const CollaboratorScalarFieldEnum = {
   id: 'id',
   role: 'role',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   userId: 'userId',
   projectId: 'projectId'
 } as const
@@ -867,9 +871,10 @@ export const TodoScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
-  completeBy: 'completeBy',
+  deadline: 'deadline',
   isCompleted: 'isCompleted',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   projectId: 'projectId',
   createdBy: 'createdBy'
 } as const
@@ -932,6 +937,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Role'
+ */
+export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role'>
+    
+
+
+/**
+ * Reference to a field of type 'Role[]'
+ */
+export type ListEnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role[]'>
     
 
 

@@ -31,6 +31,7 @@ export type PersonMinAggregateOutputType = {
   dob: Date | null
   gender: string | null
   createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type PersonMaxAggregateOutputType = {
@@ -40,6 +41,7 @@ export type PersonMaxAggregateOutputType = {
   dob: Date | null
   gender: string | null
   createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type PersonCountAggregateOutputType = {
@@ -49,6 +51,7 @@ export type PersonCountAggregateOutputType = {
   dob: number
   gender: number
   createdAt: number
+  updatedAt: number
   _all: number
 }
 
@@ -60,6 +63,7 @@ export type PersonMinAggregateInputType = {
   dob?: true
   gender?: true
   createdAt?: true
+  updatedAt?: true
 }
 
 export type PersonMaxAggregateInputType = {
@@ -69,6 +73,7 @@ export type PersonMaxAggregateInputType = {
   dob?: true
   gender?: true
   createdAt?: true
+  updatedAt?: true
 }
 
 export type PersonCountAggregateInputType = {
@@ -78,6 +83,7 @@ export type PersonCountAggregateInputType = {
   dob?: true
   gender?: true
   createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -160,6 +166,7 @@ export type PersonGroupByOutputType = {
   dob: Date
   gender: string
   createdAt: Date
+  updatedAt: Date | null
   _count: PersonCountAggregateOutputType | null
   _min: PersonMinAggregateOutputType | null
   _max: PersonMaxAggregateOutputType | null
@@ -190,6 +197,7 @@ export type PersonWhereInput = {
   dob?: Prisma.DateTimeFilter<"Person"> | Date | string
   gender?: Prisma.StringFilter<"Person"> | string
   createdAt?: Prisma.DateTimeFilter<"Person"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"Person"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
@@ -200,6 +208,7 @@ export type PersonOrderByWithRelationInput = {
   dob?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -213,6 +222,7 @@ export type PersonWhereUniqueInput = Prisma.AtLeast<{
   dob?: Prisma.DateTimeFilter<"Person"> | Date | string
   gender?: Prisma.StringFilter<"Person"> | string
   createdAt?: Prisma.DateTimeFilter<"Person"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"Person"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
@@ -223,6 +233,7 @@ export type PersonOrderByWithAggregationInput = {
   dob?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PersonCountOrderByAggregateInput
   _max?: Prisma.PersonMaxOrderByAggregateInput
   _min?: Prisma.PersonMinOrderByAggregateInput
@@ -238,6 +249,7 @@ export type PersonScalarWhereWithAggregatesInput = {
   dob?: Prisma.DateTimeWithAggregatesFilter<"Person"> | Date | string
   gender?: Prisma.StringWithAggregatesFilter<"Person"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Person"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Person"> | Date | string | null
 }
 
 export type PersonCreateInput = {
@@ -247,6 +259,7 @@ export type PersonCreateInput = {
   dob: Date | string
   gender: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   user?: Prisma.UserCreateNestedOneWithoutPersonInput
 }
 
@@ -257,6 +270,7 @@ export type PersonUncheckedCreateInput = {
   dob: Date | string
   gender: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   user?: Prisma.UserUncheckedCreateNestedOneWithoutPersonInput
 }
 
@@ -267,6 +281,7 @@ export type PersonUpdateInput = {
   dob?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneWithoutPersonNestedInput
 }
 
@@ -277,6 +292,7 @@ export type PersonUncheckedUpdateInput = {
   dob?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUncheckedUpdateOneWithoutPersonNestedInput
 }
 
@@ -287,6 +303,7 @@ export type PersonCreateManyInput = {
   dob: Date | string
   gender: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
 }
 
 export type PersonUpdateManyMutationInput = {
@@ -296,6 +313,7 @@ export type PersonUpdateManyMutationInput = {
   dob?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PersonUncheckedUpdateManyInput = {
@@ -305,6 +323,7 @@ export type PersonUncheckedUpdateManyInput = {
   dob?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PersonCountOrderByAggregateInput = {
@@ -314,6 +333,7 @@ export type PersonCountOrderByAggregateInput = {
   dob?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type PersonMaxOrderByAggregateInput = {
@@ -323,6 +343,7 @@ export type PersonMaxOrderByAggregateInput = {
   dob?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type PersonMinOrderByAggregateInput = {
@@ -332,6 +353,7 @@ export type PersonMinOrderByAggregateInput = {
   dob?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type PersonScalarRelationFilter = {
@@ -349,6 +371,10 @@ export type NullableStringFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type PersonCreateNestedOneWithoutUserInput = {
@@ -372,6 +398,7 @@ export type PersonCreateWithoutUserInput = {
   dob: Date | string
   gender: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
 }
 
 export type PersonUncheckedCreateWithoutUserInput = {
@@ -381,6 +408,7 @@ export type PersonUncheckedCreateWithoutUserInput = {
   dob: Date | string
   gender: string
   createdAt?: Date | string
+  updatedAt?: Date | string | null
 }
 
 export type PersonCreateOrConnectWithoutUserInput = {
@@ -406,6 +434,7 @@ export type PersonUpdateWithoutUserInput = {
   dob?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PersonUncheckedUpdateWithoutUserInput = {
@@ -415,6 +444,7 @@ export type PersonUncheckedUpdateWithoutUserInput = {
   dob?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -426,6 +456,7 @@ export type PersonSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   dob?: boolean
   gender?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   user?: boolean | Prisma.Person$userArgs<ExtArgs>
 }, ExtArgs["result"]["person"]>
 
@@ -436,6 +467,7 @@ export type PersonSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   dob?: boolean
   gender?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
 }, ExtArgs["result"]["person"]>
 
 export type PersonSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -445,6 +477,7 @@ export type PersonSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   dob?: boolean
   gender?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
 }, ExtArgs["result"]["person"]>
 
 export type PersonSelectScalar = {
@@ -454,9 +487,10 @@ export type PersonSelectScalar = {
   dob?: boolean
   gender?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type PersonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstname" | "lastname" | "dob" | "gender" | "createdAt", ExtArgs["result"]["person"]>
+export type PersonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstname" | "lastname" | "dob" | "gender" | "createdAt" | "updatedAt", ExtArgs["result"]["person"]>
 export type PersonInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.Person$userArgs<ExtArgs>
 }
@@ -475,6 +509,7 @@ export type $PersonPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     dob: Date
     gender: string
     createdAt: Date
+    updatedAt: Date | null
   }, ExtArgs["result"]["person"]>
   composites: {}
 }
@@ -905,6 +940,7 @@ export interface PersonFieldRefs {
   readonly dob: Prisma.FieldRef<"Person", 'DateTime'>
   readonly gender: Prisma.FieldRef<"Person", 'String'>
   readonly createdAt: Prisma.FieldRef<"Person", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"Person", 'DateTime'>
 }
     
 

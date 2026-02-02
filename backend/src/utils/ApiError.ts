@@ -1,4 +1,4 @@
-import { ApiErrorDetails, ApiErrorShape, HttpStatus } from "../types/index.js";
+import { ApiErrorDetails, ApiErrorShape, HttpStatus } from "../types/api"
 
 export class ApiError extends Error implements ApiErrorShape {
   statusCode: HttpStatus;
@@ -8,8 +8,8 @@ export class ApiError extends Error implements ApiErrorShape {
   constructor(
     statusCode: HttpStatus,
     message: string,
-    errors?: ApiErrorDetails[],
     isOperational = true,
+    errors?: ApiErrorDetails[],
   ) {
     super(message);
 

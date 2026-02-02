@@ -1,12 +1,12 @@
+import { configDotenv } from "dotenv";
 
-import { configDotenv } from "dotenv"
-
-configDotenv({path:".env"})
+configDotenv({ path: ".env" });
 
 export type Environment = "development" | "test" | "production";
 
 interface EnvConfig {
   PORT: number;
+  CORS_ORIGIN: string;
   DATABASE_URL: string;
   ACCELERATE_URL: string;
   ACCESS_TOKEN_SECRET: string;
@@ -17,6 +17,7 @@ interface EnvConfig {
 
 export const EnvVariables: EnvConfig = {
   PORT: Number(process.env.PORT) || 4000,
+  CORS_ORIGIN: process.env.CORS_ORIGIN || "",
   DATABASE_URL: process.env.DIRECT_DATABASE_URL || "",
   ACCELERATE_URL: process.env.DATABASE_URL || "",
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET || "",

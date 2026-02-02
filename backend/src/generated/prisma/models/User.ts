@@ -31,6 +31,7 @@ export type UserMinAggregateOutputType = {
   password: string | null
   refreshToken: string | null
   createdAt: Date | null
+  updatedAt: Date | null
   personId: string | null
 }
 
@@ -41,6 +42,7 @@ export type UserMaxAggregateOutputType = {
   password: string | null
   refreshToken: string | null
   createdAt: Date | null
+  updatedAt: Date | null
   personId: string | null
 }
 
@@ -51,6 +53,7 @@ export type UserCountAggregateOutputType = {
   password: number
   refreshToken: number
   createdAt: number
+  updatedAt: number
   personId: number
   _all: number
 }
@@ -63,6 +66,7 @@ export type UserMinAggregateInputType = {
   password?: true
   refreshToken?: true
   createdAt?: true
+  updatedAt?: true
   personId?: true
 }
 
@@ -73,6 +77,7 @@ export type UserMaxAggregateInputType = {
   password?: true
   refreshToken?: true
   createdAt?: true
+  updatedAt?: true
   personId?: true
 }
 
@@ -83,6 +88,7 @@ export type UserCountAggregateInputType = {
   password?: true
   refreshToken?: true
   createdAt?: true
+  updatedAt?: true
   personId?: true
   _all?: true
 }
@@ -166,6 +172,7 @@ export type UserGroupByOutputType = {
   password: string
   refreshToken: string | null
   createdAt: Date
+  updatedAt: Date | null
   personId: string
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
@@ -197,6 +204,7 @@ export type UserWhereInput = {
   password?: Prisma.StringFilter<"User"> | string
   refreshToken?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   personId?: Prisma.StringFilter<"User"> | string
   person?: Prisma.XOR<Prisma.PersonScalarRelationFilter, Prisma.PersonWhereInput>
   todos?: Prisma.TodoListRelationFilter
@@ -211,6 +219,7 @@ export type UserOrderByWithRelationInput = {
   password?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   personId?: Prisma.SortOrder
   person?: Prisma.PersonOrderByWithRelationInput
   todos?: Prisma.TodoOrderByRelationAggregateInput
@@ -229,6 +238,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   password?: Prisma.StringFilter<"User"> | string
   refreshToken?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   person?: Prisma.XOR<Prisma.PersonScalarRelationFilter, Prisma.PersonWhereInput>
   todos?: Prisma.TodoListRelationFilter
   collaborations?: Prisma.CollaboratorListRelationFilter
@@ -242,6 +252,7 @@ export type UserOrderByWithAggregationInput = {
   password?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   personId?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -258,6 +269,7 @@ export type UserScalarWhereWithAggregatesInput = {
   password?: Prisma.StringWithAggregatesFilter<"User"> | string
   refreshToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   personId?: Prisma.StringWithAggregatesFilter<"User"> | string
 }
 
@@ -268,6 +280,7 @@ export type UserCreateInput = {
   password: string
   refreshToken?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   person: Prisma.PersonCreateNestedOneWithoutUserInput
   todos?: Prisma.TodoCreateNestedManyWithoutCreatorInput
   collaborations?: Prisma.CollaboratorCreateNestedManyWithoutUserInput
@@ -281,6 +294,7 @@ export type UserUncheckedCreateInput = {
   password: string
   refreshToken?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   personId: string
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutCreatorInput
   collaborations?: Prisma.CollaboratorUncheckedCreateNestedManyWithoutUserInput
@@ -294,6 +308,7 @@ export type UserUpdateInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   person?: Prisma.PersonUpdateOneRequiredWithoutUserNestedInput
   todos?: Prisma.TodoUpdateManyWithoutCreatorNestedInput
   collaborations?: Prisma.CollaboratorUpdateManyWithoutUserNestedInput
@@ -307,6 +322,7 @@ export type UserUncheckedUpdateInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   personId?: Prisma.StringFieldUpdateOperationsInput | string
   todos?: Prisma.TodoUncheckedUpdateManyWithoutCreatorNestedInput
   collaborations?: Prisma.CollaboratorUncheckedUpdateManyWithoutUserNestedInput
@@ -320,6 +336,7 @@ export type UserCreateManyInput = {
   password: string
   refreshToken?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   personId: string
 }
 
@@ -330,6 +347,7 @@ export type UserUpdateManyMutationInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -339,6 +357,7 @@ export type UserUncheckedUpdateManyInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   personId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -354,6 +373,7 @@ export type UserCountOrderByAggregateInput = {
   password?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   personId?: Prisma.SortOrder
 }
 
@@ -364,6 +384,7 @@ export type UserMaxOrderByAggregateInput = {
   password?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   personId?: Prisma.SortOrder
 }
 
@@ -374,6 +395,7 @@ export type UserMinOrderByAggregateInput = {
   password?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   personId?: Prisma.SortOrder
 }
 
@@ -463,6 +485,7 @@ export type UserCreateWithoutPersonInput = {
   password: string
   refreshToken?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   todos?: Prisma.TodoCreateNestedManyWithoutCreatorInput
   collaborations?: Prisma.CollaboratorCreateNestedManyWithoutUserInput
   ownedProjects?: Prisma.ProjectCreateNestedManyWithoutOwnerInput
@@ -475,6 +498,7 @@ export type UserUncheckedCreateWithoutPersonInput = {
   password: string
   refreshToken?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutCreatorInput
   collaborations?: Prisma.CollaboratorUncheckedCreateNestedManyWithoutUserInput
   ownedProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOwnerInput
@@ -503,6 +527,7 @@ export type UserUpdateWithoutPersonInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   todos?: Prisma.TodoUpdateManyWithoutCreatorNestedInput
   collaborations?: Prisma.CollaboratorUpdateManyWithoutUserNestedInput
   ownedProjects?: Prisma.ProjectUpdateManyWithoutOwnerNestedInput
@@ -515,6 +540,7 @@ export type UserUncheckedUpdateWithoutPersonInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   todos?: Prisma.TodoUncheckedUpdateManyWithoutCreatorNestedInput
   collaborations?: Prisma.CollaboratorUncheckedUpdateManyWithoutUserNestedInput
   ownedProjects?: Prisma.ProjectUncheckedUpdateManyWithoutOwnerNestedInput
@@ -527,6 +553,7 @@ export type UserCreateWithoutOwnedProjectsInput = {
   password: string
   refreshToken?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   person: Prisma.PersonCreateNestedOneWithoutUserInput
   todos?: Prisma.TodoCreateNestedManyWithoutCreatorInput
   collaborations?: Prisma.CollaboratorCreateNestedManyWithoutUserInput
@@ -539,6 +566,7 @@ export type UserUncheckedCreateWithoutOwnedProjectsInput = {
   password: string
   refreshToken?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   personId: string
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutCreatorInput
   collaborations?: Prisma.CollaboratorUncheckedCreateNestedManyWithoutUserInput
@@ -567,6 +595,7 @@ export type UserUpdateWithoutOwnedProjectsInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   person?: Prisma.PersonUpdateOneRequiredWithoutUserNestedInput
   todos?: Prisma.TodoUpdateManyWithoutCreatorNestedInput
   collaborations?: Prisma.CollaboratorUpdateManyWithoutUserNestedInput
@@ -579,6 +608,7 @@ export type UserUncheckedUpdateWithoutOwnedProjectsInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   personId?: Prisma.StringFieldUpdateOperationsInput | string
   todos?: Prisma.TodoUncheckedUpdateManyWithoutCreatorNestedInput
   collaborations?: Prisma.CollaboratorUncheckedUpdateManyWithoutUserNestedInput
@@ -591,6 +621,7 @@ export type UserCreateWithoutCollaborationsInput = {
   password: string
   refreshToken?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   person: Prisma.PersonCreateNestedOneWithoutUserInput
   todos?: Prisma.TodoCreateNestedManyWithoutCreatorInput
   ownedProjects?: Prisma.ProjectCreateNestedManyWithoutOwnerInput
@@ -603,6 +634,7 @@ export type UserUncheckedCreateWithoutCollaborationsInput = {
   password: string
   refreshToken?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   personId: string
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutCreatorInput
   ownedProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOwnerInput
@@ -631,6 +663,7 @@ export type UserUpdateWithoutCollaborationsInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   person?: Prisma.PersonUpdateOneRequiredWithoutUserNestedInput
   todos?: Prisma.TodoUpdateManyWithoutCreatorNestedInput
   ownedProjects?: Prisma.ProjectUpdateManyWithoutOwnerNestedInput
@@ -643,6 +676,7 @@ export type UserUncheckedUpdateWithoutCollaborationsInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   personId?: Prisma.StringFieldUpdateOperationsInput | string
   todos?: Prisma.TodoUncheckedUpdateManyWithoutCreatorNestedInput
   ownedProjects?: Prisma.ProjectUncheckedUpdateManyWithoutOwnerNestedInput
@@ -655,6 +689,7 @@ export type UserCreateWithoutTodosInput = {
   password: string
   refreshToken?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   person: Prisma.PersonCreateNestedOneWithoutUserInput
   collaborations?: Prisma.CollaboratorCreateNestedManyWithoutUserInput
   ownedProjects?: Prisma.ProjectCreateNestedManyWithoutOwnerInput
@@ -667,6 +702,7 @@ export type UserUncheckedCreateWithoutTodosInput = {
   password: string
   refreshToken?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string | null
   personId: string
   collaborations?: Prisma.CollaboratorUncheckedCreateNestedManyWithoutUserInput
   ownedProjects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOwnerInput
@@ -695,6 +731,7 @@ export type UserUpdateWithoutTodosInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   person?: Prisma.PersonUpdateOneRequiredWithoutUserNestedInput
   collaborations?: Prisma.CollaboratorUpdateManyWithoutUserNestedInput
   ownedProjects?: Prisma.ProjectUpdateManyWithoutOwnerNestedInput
@@ -707,6 +744,7 @@ export type UserUncheckedUpdateWithoutTodosInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   personId?: Prisma.StringFieldUpdateOperationsInput | string
   collaborations?: Prisma.CollaboratorUncheckedUpdateManyWithoutUserNestedInput
   ownedProjects?: Prisma.ProjectUncheckedUpdateManyWithoutOwnerNestedInput
@@ -768,6 +806,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   password?: boolean
   refreshToken?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   personId?: boolean
   person?: boolean | Prisma.PersonDefaultArgs<ExtArgs>
   todos?: boolean | Prisma.User$todosArgs<ExtArgs>
@@ -783,6 +822,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   password?: boolean
   refreshToken?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   personId?: boolean
   person?: boolean | Prisma.PersonDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -794,6 +834,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   password?: boolean
   refreshToken?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   personId?: boolean
   person?: boolean | Prisma.PersonDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -805,10 +846,11 @@ export type UserSelectScalar = {
   password?: boolean
   refreshToken?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   personId?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "password" | "refreshToken" | "createdAt" | "personId", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "password" | "refreshToken" | "createdAt" | "updatedAt" | "personId", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   person?: boolean | Prisma.PersonDefaultArgs<ExtArgs>
   todos?: boolean | Prisma.User$todosArgs<ExtArgs>
@@ -838,6 +880,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     password: string
     refreshToken: string | null
     createdAt: Date
+    updatedAt: Date | null
     personId: string
   }, ExtArgs["result"]["user"]>
   composites: {}
@@ -1272,6 +1315,7 @@ export interface UserFieldRefs {
   readonly password: Prisma.FieldRef<"User", 'String'>
   readonly refreshToken: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly personId: Prisma.FieldRef<"User", 'String'>
 }
     
