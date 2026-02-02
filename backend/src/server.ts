@@ -1,0 +1,1 @@
+import { EnvVariables } from "./types/common/Environment.types"

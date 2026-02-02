@@ -1,0 +1,1 @@
+export type AuthRole = "owner" | "viewer" | "admin" | "editor"

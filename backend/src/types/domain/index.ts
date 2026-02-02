@@ -1,0 +1,5 @@
+export * from "./Collaborator.domain"
+export * from "./Person.domain"
+export * from "./Project.domain"
+export * from "./Todo.domain"
+export * from "./User.domain"
