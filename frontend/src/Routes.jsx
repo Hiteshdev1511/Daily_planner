@@ -21,6 +21,8 @@ import {
   Project,
   VerifyEmail,
   ForgetPassword,
+  ForgotPassword,
+  ResetPassword,
 } from "./pages/index.js";
 import { useSelector } from "react-redux";
 
@@ -54,10 +56,12 @@ const router = createBrowserRouter(
     </Route>,
     <Route path="login" element={<Login />} />,
     <Route path="signup" element={<Signup />} />,
-    <Route path="verify-email" element={<VerifyEmail/>}/>,
-    <Route path="forget-password" element={<ForgetPassword/>}/>,
+    <Route path="verify-email" element={<VerifyEmail />} />,
+    <Route path="forget-password" element={<ForgetPassword />} />,
+    <Route path="forgot-password" element={<ForgotPassword />} />,
+    <Route path="reset-password" element={<ResetPassword />} />,
     <Route path="*" element={<ErrorPage />} />,
-  ])
+  ]),
 );
 
 export default function Routes() {

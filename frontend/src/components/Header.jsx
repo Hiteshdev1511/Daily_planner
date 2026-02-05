@@ -3,7 +3,7 @@ import { useState, useRef } from "react"; // Make sure to import useRef
 import Logo from "./Logo";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../features/user/userSlice";
+import { logoutUser } from "../features/user/userSlice";
 
 // A reusable dropdown component
 // eslint-disable-next-line react/prop-types
@@ -64,19 +64,23 @@ const NavLink = ({ children, href = "#" }) => (
 
 // Header component (No changes here)
 function Header() {
-  const { id: userId } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch()
 
   function getStartedHandler() {
-    if (!userId) {
+    if (!user) {
       navigate("/signup");
     } else {
       navigate("/app");
     }
   }
   function logoutHandler() {
-    dispatch(logout())
+    dispatch(logoutUser())
+      .unwrap()
+      .then(() => {
+        navigate("/login");
+      });
   }
   return (
     <nav className="flex justify-around bg-white text-black py-2 h-20 items-center shadow-sm sticky top-0 z-10">
@@ -125,7 +129,7 @@ function Header() {
         </DropdownItem>
 
         <NavLink>Pricing</NavLink>
-        {userId ? (
+        {user ? (
           <button 
             onClick={logoutHandler}
             className="h-10 px-4 hover:bg-gray-100 rounded-lg flex items-center justify-center font-semibold hover:cursor-pointer">
@@ -137,7 +141,7 @@ function Header() {
 
         <div className="ml-4 h-10 px-5 text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center font-semibold rounded-lg">
           <button onClick={getStartedHandler}>
-            {userId ? "Start for free" : "Sign up"}
+            {user ? "Start for free" : "Sign up"}
           </button>
         </div>
       </ul>

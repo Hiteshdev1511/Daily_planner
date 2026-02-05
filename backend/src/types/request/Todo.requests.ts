@@ -10,7 +10,7 @@ type TodoRequest = {
 
 export type CreateTodoRequest = TodoRequest;
 export type UpdateTodoRequest = Partial<
-  Omit<TodoRequest, "projectId" | "isCompleted">
+  Omit<TodoRequest, "deadline" | "projectId" | "isCompleted">
 >;
 export type ChangeDeadlineRequest = Pick<TodoRequest, "deadline">;
 export type CompleteTodoRequest = Pick<TodoRequest, "isCompleted">;

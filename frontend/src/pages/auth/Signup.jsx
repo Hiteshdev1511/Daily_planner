@@ -4,49 +4,73 @@ import { Eye } from "lucide-react";
 import verifyInput from "../../utils/verifyInput";
 import { useIsUsernameUnique } from "../../hooks/useIsUsernameUnique";
 import { useNavigate } from "react-router-dom";
+import { authAPI } from "../../services/apiEndpoints";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../features/user/userSlice";
 
 function Signup() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [dob, setDob] = useState("");
+  const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
   const [confPassword, setConfPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-
-  // 1. Add a state to track if form submission has been attempted
   const [submitted, setSubmitted] = useState(false);
 
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const { data: isUsernameUnique } = useIsUsernameUnique(username);
 
-  // Helper variables for validation checks
   const isEmailInvalid = submitted && !email;
   const isUsernameInvalid = submitted && !username;
+  const isFirstnameInvalid = submitted && !firstname;
+  const isDobInvalid = submitted && !dob;
+  const isGenderInvalid = submitted && !gender;
   const isPasswordInvalid = submitted && !password;
   const isConfPasswordInvalid =
     submitted && (!confPassword || password !== confPassword);
 
-  function formSubmitHandler() {
-    // 2. Set submitted to true on any submission attempt
+  async function formSubmitHandler() {
     setSubmitted(true);
 
-    // Your existing validation logic
     if (
       verifyInput({ email, username, confPassword, password }, "signin") &&
-      isUsernameUnique
+      isUsernameUnique &&
+      firstname &&
+      dob &&
+      gender
     ) {
       try {
-        console.log("Verified");
         setIsSubmitting(true);
         setError(null);
-        console.log(
-          "simulate an api call Asynchromous function and send to the app page"
-        );
+
+        const signupData = {
+          email,
+          username,
+          password,
+          firstname,
+          lastname,
+          dob: new Date(dob),
+          gender,
+        };
+
+        const response = await authAPI.register(signupData);
+        const { data } = response.data;
+
+        // Tokens are now handled via httpOnly cookies
+        dispatch(setUser(data.user));
+
         navigate("/");
-      } catch (error) {
-        setError(error);
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || "Signup failed. Please try again.";
+        setError(errorMessage);
+        console.error("Signup error:", err);
       } finally {
         setIsSubmitting(false);
       }
@@ -55,20 +79,21 @@ function Signup() {
     }
   }
 
-  if (error) {
-    return <div>{error}</div>;
-  }
-
   return (
     <>
-      <section className="bg-gray-50">
-        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+      <section className="bg-gray-50 min-h-screen py-8">
+        <div className="flex flex-col items-center justify-center px-6 mx-auto w-full md:w-auto">
           <Logo />
           <div className="w-full bg-white rounded-lg shadow dark:border mt-5 sm:max-w-md xl:p-0">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
                 {isSubmitting ? "Processing..." : "Sign up"}
               </h1>
+              {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                  <span className="block sm:inline">{error}</span>
+                </div>
+              )}
               <div className="space-y-4 md:space-y-6">
                 {/* Email Input */}
                 <div>
@@ -80,18 +105,116 @@ function Signup() {
                   </label>
                   <input
                     onChange={(e) => setEmail(e.target.value)}
+                    value={email}
                     type="email"
-                    // 3. Conditionally apply error styles based on state
                     className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
                       isEmailInvalid ? "border-red-500" : "border-gray-300"
                     }`}
                     placeholder="name@company.com"
                     required={true}
+                    disabled={isSubmitting}
                   />
-                  {/* 4. Conditionally render the error message */}
                   {isEmailInvalid && (
                     <p className="mt-1 text-sm text-red-600">
                       Please enter a valid email address.
+                    </p>
+                  )}
+                </div>
+
+                {/* First Name */}
+                <div>
+                  <label
+                    htmlFor="firstname"
+                    className="block mb-2 text-sm font-medium text-gray-900"
+                  >
+                    First Name
+                  </label>
+                  <input
+                    onChange={(e) => setFirstname(e.target.value)}
+                    value={firstname}
+                    type="text"
+                    className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
+                      isFirstnameInvalid ? "border-red-500" : "border-gray-300"
+                    }`}
+                    placeholder="John"
+                    required
+                    disabled={isSubmitting}
+                  />
+                  {isFirstnameInvalid && (
+                    <p className="mt-1 text-sm text-red-600">
+                      First name is required.
+                    </p>
+                  )}
+                </div>
+
+                {/* Last Name */}
+                <div>
+                  <label
+                    htmlFor="lastname"
+                    className="block mb-2 text-sm font-medium text-gray-900"
+                  >
+                    Last Name (Optional)
+                  </label>
+                  <input
+                    onChange={(e) => setLastname(e.target.value)}
+                    value={lastname}
+                    type="text"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    placeholder="Doe"
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                {/* DOB */}
+                <div>
+                  <label
+                    htmlFor="dob"
+                    className="block mb-2 text-sm font-medium text-gray-900"
+                  >
+                    Date of Birth
+                  </label>
+                  <input
+                    onChange={(e) => setDob(e.target.value)}
+                    value={dob}
+                    type="date"
+                    className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
+                      isDobInvalid ? "border-red-500" : "border-gray-300"
+                    }`}
+                    required
+                    disabled={isSubmitting}
+                  />
+                  {isDobInvalid && (
+                    <p className="mt-1 text-sm text-red-600">
+                      Date of birth is required.
+                    </p>
+                  )}
+                </div>
+
+                {/* Gender */}
+                <div>
+                  <label
+                    htmlFor="gender"
+                    className="block mb-2 text-sm font-medium text-gray-900"
+                  >
+                    Gender
+                  </label>
+                  <select
+                    onChange={(e) => setGender(e.target.value)}
+                    value={gender}
+                    className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
+                      isGenderInvalid ? "border-red-500" : "border-gray-300"
+                    }`}
+                    required
+                    disabled={isSubmitting}
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  {isGenderInvalid && (
+                    <p className="mt-1 text-sm text-red-600">
+                      Gender is required.
                     </p>
                   )}
                 </div>
@@ -106,6 +229,7 @@ function Signup() {
                   </label>
                   <input
                     onChange={(e) => setUsername(e.target.value)}
+                    value={username}
                     type="text"
                     className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
                       isUsernameInvalid || (!isUsernameUnique && username != "")
@@ -114,6 +238,7 @@ function Signup() {
                     }`}
                     placeholder="Unique username"
                     required
+                    disabled={isSubmitting}
                   />
                   {!isUsernameUnique && username != "" && (
                     <p className="mt-1 text-sm text-red-600">
@@ -142,21 +267,22 @@ function Signup() {
                   >
                     <input
                       onChange={(e) => setPassword(e.target.value)}
+                      value={password}
                       type={showPassword ? "text" : "password"}
-                      // 3. Conditionally apply error styles based on state
-
                       placeholder={
                         showPassword ? "igq48#$P2asd" : "************"
                       }
+                      className="focus:outline-none h-full w-full bg-transparent"
                       required={true}
+                      disabled={isSubmitting}
                     />
                     <Eye
                       size={"30"}
                       color="grey"
                       onClick={() => setShowPassword(!showPassword)}
+                      className="cursor-pointer"
                     />
                   </div>
-                  {/* 4. Conditionally render the error message */}
                   {isPasswordInvalid && (
                     <p className="mt-1 text-sm text-red-600">
                       Password field can not be empty
@@ -181,17 +307,17 @@ function Signup() {
                   >
                     <input
                       onChange={(e) => setConfPassword(e.target.value)}
+                      value={confPassword}
                       type="password"
-                      // 3. Conditionally apply error styles based on state
-
                       placeholder="************"
                       required={true}
+                      disabled={isSubmitting}
+                      className="focus:outline-none h-full w-full bg-transparent"
                     />
                   </div>
-                  {/* 4. Conditionally render the error message */}
                   {isConfPasswordInvalid && (
                     <p className="mt-1 text-sm text-red-600">
-                      Password field can not be empty
+                      Passwords do not match
                     </p>
                   )}
                 </div>
@@ -199,9 +325,10 @@ function Signup() {
                 {/* ... (button and other fields) */}
                 <button
                   onClick={formSubmitHandler}
-                  className="w-full text-white bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
+                  disabled={isSubmitting}
+                  className="w-full text-white bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Sign up
+                  {isSubmitting ? "Signing up..." : "Sign up"}
                 </button>
 
                 <div className="flex flex-col h-25 items-center justify-between">

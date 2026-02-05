@@ -7,15 +7,21 @@ import {
   MoreHorizontal,
   Check,
 } from "lucide-react";
-import { useDispatch, } from "react-redux";
-import { completeTodo } from "../features/todo/todoSlice";
+import { useDispatch } from "react-redux";
+import { toggleTodo } from "../features/todo/todoSlice";
 
 // The TodoItem component receives task data as props.
-function TodoItem({ todo }) {
-  const dispatch = useDispatch()
+function TodoItem({ todo, projectId }) {
+  const dispatch = useDispatch();
 
   function todoCompleteHandler(id) {
-    dispatch(completeTodo(id))
+    // Determine projectId: prop > todo.project (if populated object) > todo.projectId
+    const pId = projectId || (typeof todo.project === 'object' ? todo.project._id : todo.project) || todo.projectId;
+    if (!pId) {
+      console.error("No projectId found for todo", todo);
+      return;
+    }
+    dispatch(toggleTodo({ projectId: pId, todoId: id }));
   }
 
   return (
@@ -27,10 +33,11 @@ function TodoItem({ todo }) {
         {/* Custom Checkbox */}
         <div className="flex-shrink-0 mt-1 mr-3 cursor-pointer">
           <div
-            onClick = {() => todoCompleteHandler(todo.id)}
-            className="cursor-pointer relative flex items-center justify-center h-5 w-5 rounded-full border-2 border-orange-400 hover:bg-orange-100">
+            onClick={() => todoCompleteHandler(todo._id)}
+            className="cursor-pointer relative flex items-center justify-center h-5 w-5 rounded-full border-2 border-orange-400 hover:bg-orange-100"
+          >
             {/* The drag handle icon is hidden by default and appears on hover over the parent `group` */}
-            {todo.isCompleted && <Check color="orange" size="400"/>}
+            {todo.isCompleted && <Check color="orange" size={16} />}
             <GripVertical className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity relative right-8" />
           </div>
         </div>

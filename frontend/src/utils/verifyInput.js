@@ -7,7 +7,7 @@ const verifyInput = (input, type = "login") => {
     const passwordVerified = password != "" && password.trim() != "";
 
     return (emailVerified || usernameVerified) && passwordVerified;
-  } else if (type == "signin" && input) {
+  } else if (type == "signup" && input) {
     const { email, username, password, confPassword } = input;
     const emailVerified =
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);

@@ -2,15 +2,29 @@ import { ErrorRequestHandler } from "express";
 import { HttpStatus } from "../types/api";
 import { ApiError } from "./ApiError";
 
-const errorHandler :ErrorRequestHandler = (err, req, res, next) =>{
-    
-    let error: ApiError = err instanceof ApiError ? err : new ApiError(HttpStatus.SERVER_ERROR, "Something went wrong", false)
-    
-    if (error.isOperational) {
-        return res.status(error.statusCode).json({message:error.message,stack:error.stack})
-    } else {
-       return res.status(HttpStatus.SERVER_ERROR).json({message:"Internal server occurred"})
-    }
-}
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  let error: ApiError;
+  if (err instanceof ApiError) {
+    error = err;
+  } else if (err instanceof Error) {
+    error = new ApiError(HttpStatus.SERVER_ERROR, err.message, false);
+  } else {
+    error = new ApiError(
+      HttpStatus.SERVER_ERROR,
+      "Something went wrong",
+      false,
+    );
+  }
 
-export default errorHandler
+  const response = {
+    success: false,
+    statusCode: error.statusCode,
+    message: error.message,
+    ...(error.errors && { errors: error.errors }),
+    ...(process.env.NODE_ENV === "development" && { stack: error.stack }),
+  };
+
+  return res.status(error.statusCode).json(response);
+};
+
+export default errorHandler;

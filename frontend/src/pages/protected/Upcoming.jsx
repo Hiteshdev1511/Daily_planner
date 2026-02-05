@@ -27,7 +27,7 @@ function Upcoming() {
   console.log(isAddTaskInputOpen)
 
 
-  const todos = useSelector((state) => state.todo);
+  const { todos } = useSelector((state) => state.todo);
 
   useEffect(() => {
     setTodoList(todos.filter((todo)=>todo.time !== "today" && todo.isCompleted === false));

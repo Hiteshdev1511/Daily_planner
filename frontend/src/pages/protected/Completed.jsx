@@ -6,7 +6,7 @@ import { TodoItem } from "../../components/index.js";
 function Completed() {
   const [todoList, setTodoList] = useState([]);
 
-  const todos = useSelector((state) => state.todo);
+  const { todos } = useSelector((state) => state.todo);
 
   useEffect(() => {
     setTodoList(todos.filter((todo) => todo.isCompleted === true));
