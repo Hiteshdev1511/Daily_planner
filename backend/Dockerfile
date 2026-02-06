@@ -12,6 +12,8 @@ COPY . .
 RUN npx prisma generate
 
 RUN npm run build
+RUN ls -la
+RUN ls -la dist
 
 
 # Production stage
