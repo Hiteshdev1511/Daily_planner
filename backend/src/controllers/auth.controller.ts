@@ -8,21 +8,16 @@ import {
   validateRegister,
   validateLogin,
   validateChangePassword,
+  validateForgotPassword,
+  validateResetPassword,
 } from "../validation/auth.validation";
 
-/**
- * Register user
- */
 export const registerUser = asyncHandler(
   async (req: Request, res: Response) => {
     const validatedData = validateRegister(req.body);
 
     const result = await AuthService.register({
-      ...validatedData,
-      firstname: req.body.firstname,
-      lastname: req.body.lastname,
-      dob: req.body.dob,
-      gender: req.body.gender,
+      ...validatedData
     });
 
     res
@@ -42,9 +37,6 @@ export const registerUser = asyncHandler(
   },
 );
 
-/**
- * Login user
- */
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const validatedData = validateLogin(req.body);
 
@@ -60,9 +52,6 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     .json(new ApiResponse(HttpStatus.OK, "Login successful", result));
 });
 
-/**
- * Logout user
- */
 export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) {
     throw new ApiError(HttpStatus.UNAUTHORIZED, "User not authenticated");
@@ -76,9 +65,6 @@ export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
     .json(new ApiResponse(HttpStatus.OK, "Logout successful", result));
 });
 
-/**
- * Change password
- */
 export const changePassword = asyncHandler(
   async (req: Request, res: Response) => {
     if (!req.user) {
@@ -97,16 +83,9 @@ export const changePassword = asyncHandler(
   },
 );
 
-/**
- * Forgot password
- */
 export const forgotPassword = asyncHandler(
   async (req: Request, res: Response) => {
-    const { email } = req.body;
-
-    if (!email) {
-      throw new ApiError(HttpStatus.BAD_REQUEST, "Email is required");
-    }
+    const {email} = validateForgotPassword(req.body)
 
     const result = await AuthService.forgotPassword(email);
 
@@ -122,19 +101,9 @@ export const forgotPassword = asyncHandler(
   },
 );
 
-/**
- * Reset password
- */
 export const resetPassword = asyncHandler(
   async (req: Request, res: Response) => {
-    const { token, newPassword } = req.body;
-
-    if (!token || !newPassword) {
-      throw new ApiError(
-        HttpStatus.BAD_REQUEST,
-        "Token and new password are required",
-      );
-    }
+    const { resetToken:token, password:newPassword } = validateResetPassword(req.body)
 
     const result = await AuthService.resetPassword(token, newPassword);
 
@@ -146,9 +115,6 @@ export const resetPassword = asyncHandler(
   },
 );
 
-/**
- * Refresh access token
- */
 export const refreshAccessToken = asyncHandler(
   async (req: Request, res: Response) => {
     const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
@@ -166,9 +132,6 @@ export const refreshAccessToken = asyncHandler(
       );
   },
 );
-/**
- * Check if username is unique
- */
 export const checkUsernameUnique = asyncHandler(
   async (req: Request, res: Response) => {
     const { username } = req.query;

@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authAPI, userAPI } from "../../services/apiEndpoints";
 
 const initialState = {
-  user: null,
+  user:null,
   status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };

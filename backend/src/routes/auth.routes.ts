@@ -21,3 +21,5 @@ router.route("/forgot-password").post(forgotPassword);
 router.route("/reset-password").post(resetPassword);
 router.route("/refresh-token").post(checkAuth, refreshAccessToken);
 router.route("/check-username").get(checkUsernameUnique);
+
+export default router

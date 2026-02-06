@@ -38,7 +38,7 @@ export class TodoService {
       data: {
         title: data.title,
         description: data.description || "",
-        deadline: data.deadline ? new Date(data.deadline) : null,
+        deadline: data.deadline as Date,
         projectId,
         createdBy: userId,
       },

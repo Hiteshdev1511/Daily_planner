@@ -101,7 +101,7 @@ export class CollaboratorService {
     newRole: "ADMIN" | "EDITOR" | "VIEWER" | "OWNER",
   ) {
     // Check if project exists
-    const project = await ProjectService.getProjectById(projectId);
+    await ProjectService.getProjectById(projectId);
 
     // Check if user has permission to change roles
     const hasPermission = await ProjectService.hasPermission(

@@ -28,7 +28,7 @@ import { useSelector } from "react-redux";
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
-  const user = useSelector((state) => state.user);
+  const {user} = useSelector((state) => state.user);
   if (!user.id) {
     return <Navigate to="/login" replace />;
   }

@@ -20,8 +20,8 @@ export const RegisterSchema = z
       .min(1),
     firstname: z.string().min(1, "First name is required"),
     lastname: z.string().optional(),
-    dob: z.coerce.date().optional(),
-    gender: z.string().optional(),
+    dob: z.coerce.date(),
+    gender: z.string(),
   });
 
 export const LoginSchema = z
@@ -54,6 +54,7 @@ export const ForgotPasswordSchema = z
 export const ResetPasswordSchema = z
   .object({
     resetToken: z.string().nonempty(),
+    password:passwordSchema
   });
 
 export function validateRegister(data: unknown) {

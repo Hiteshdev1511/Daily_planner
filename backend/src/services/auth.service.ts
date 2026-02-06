@@ -16,9 +16,6 @@ import type { AuthTokens, JWTPayload } from "../types/auth";
 const SALT_ROUNDS = 10;
 
 export class AuthService {
-  /**
-   * Register a new user
-   */
   static async register(
     data: RegisterRequest & {
       firstname: string;
@@ -86,20 +83,15 @@ export class AuthService {
     };
   }
 
-  /**
-   * Login user
-   */
   static async login(data: LoginRequest) {
-    const loginData = data as any;
-
     let user;
-    if ("email" in loginData && loginData.email) {
+    if (data.email) {
       user = await client.user.findFirst({
-        where: { email: loginData.email },
+        where: { email: data.email },
       });
-    } else {
+    } else if (data.username) {
       user = await client.user.findFirst({
-        where: { username: loginData.username },
+        where: { username: data.username },
       });
     }
 
@@ -109,7 +101,7 @@ export class AuthService {
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(
-      loginData.password,
+      data.password,
       user.password,
     );
     if (!isPasswordValid) {
@@ -136,9 +128,6 @@ export class AuthService {
     };
   }
 
-  /**
-   * Logout user
-   */
   static async logout(userId: string) {
     await client.user.update({
       where: { id: userId },
@@ -148,9 +137,6 @@ export class AuthService {
     return { id: userId };
   }
 
-  /**
-   * Change password
-   */
   static async changePassword(userId: string, data: ChangePasswordRequest) {
     const user = await client.user.findUnique({
       where: { id: userId },
@@ -184,9 +170,6 @@ export class AuthService {
     return { id: userId };
   }
 
-  /**
-   * Refresh access token
-   */
   static async refreshAccessToken(refreshToken: string) {
     try {
       const payload = jwt.verify(
@@ -216,68 +199,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * Generate access and refresh tokens
-   */
-  private static generateTokens(userId: string): AuthTokens {
-    const accessTokenSecret = EnvVariables.ACCESS_TOKEN_SECRET as string;
-    const refreshTokenSecret = EnvVariables.REFRESH_TOKEN_SECRET as string;
-    const accessTokenExpiry = EnvVariables.ACCESS_TOKEN_EXPIRY as string;
-    const refreshTokenExpiry = EnvVariables.REFRESH_TOKEN_EXPIRY as string;
-
-    const accessToken = jwt.sign({ userId }, accessTokenSecret, {
-      expiresIn: accessTokenExpiry,
-    } as SignOptions);
-
-    const refreshToken = jwt.sign({ userId }, refreshTokenSecret, {
-      expiresIn: refreshTokenExpiry,
-    } as SignOptions);
-
-    // Calculate expiration dates
-    const accessTokenExpiresAt = new Date(
-      Date.now() + this.parseExpiryTime(accessTokenExpiry) * 1000,
-    );
-    const refreshTokenExpiresAt = new Date(
-      Date.now() + this.parseExpiryTime(refreshTokenExpiry) * 1000,
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiresAt,
-      refreshTokenExpiresAt,
-    };
-  }
-
-  /**
-   * Parse expiry time string to seconds
-   */
-  private static parseExpiryTime(time: string): number {
-    const units: Record<string, number> = {
-      s: 1,
-      m: 60,
-      h: 3600,
-      d: 86400,
-    };
-    const match = time.match(/^(\d+)([smhd])$/);
-    if (!match) return 3600; // default 1 hour
-    return parseInt(match[1]) * (units[match[2]] || 1);
-  }
-
-  /**
-   * Verify JWT token
-   */
-  static verifyAccessToken(token: string): JWTPayload {
-    try {
-      return jwt.verify(token, EnvVariables.ACCESS_TOKEN_SECRET) as JWTPayload;
-    } catch (error) {
-      throw new ApiError(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
-    }
-  }
-
-  /**
-   * Forgot password - generate reset token and send email
-   */
   static async forgotPassword(email: string) {
     const user = await client.user.findUnique({
       where: { email },
@@ -311,9 +232,6 @@ export class AuthService {
     return { message: "Password reset email sent successfully" };
   }
 
-  /**
-   * Reset password - verify token and update password
-   */
   static async resetPassword(token: string, newPassword: string) {
     // Hash the token to compare with database
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
@@ -350,9 +268,6 @@ export class AuthService {
     return { id: user.id };
   }
 
-  /**
-   * Send password reset email
-   */
   private static async sendResetEmail(email: string, resetUrl: string) {
     try {
       const transporter = nodemailer.createTransport({
@@ -382,9 +297,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * Check if username is unique
-   */
   static async checkUsernameUnique(username: string) {
     const user = await client.user.findUnique({
       where: { username },
@@ -395,3 +307,54 @@ export class AuthService {
       username,
     };
   }
+
+  private static generateTokens(userId: string): AuthTokens {
+    const accessTokenSecret = EnvVariables.ACCESS_TOKEN_SECRET as string;
+    const refreshTokenSecret = EnvVariables.REFRESH_TOKEN_SECRET as string;
+    const accessTokenExpiry = EnvVariables.ACCESS_TOKEN_EXPIRY as string;
+    const refreshTokenExpiry = EnvVariables.REFRESH_TOKEN_EXPIRY as string;
+
+    const accessToken = jwt.sign({ userId }, accessTokenSecret, {
+      expiresIn: accessTokenExpiry,
+    } as SignOptions);
+
+    const refreshToken = jwt.sign({ userId }, refreshTokenSecret, {
+      expiresIn: refreshTokenExpiry,
+    } as SignOptions);
+
+    // Calculate expiration dates
+    const accessTokenExpiresAt = new Date(
+      Date.now() + this.parseExpiryTime(accessTokenExpiry) * 1000,
+    );
+    const refreshTokenExpiresAt = new Date(
+      Date.now() + this.parseExpiryTime(refreshTokenExpiry) * 1000,
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiresAt,
+      refreshTokenExpiresAt,
+    };
+  }
+
+  private static parseExpiryTime(time: string): number {
+    const units: Record<string, number> = {
+      s: 1,
+      m: 60,
+      h: 3600,
+      d: 86400,
+    };
+    const match = time.match(/^(\d+)([smhd])$/);
+    if (!match) return 3600; // default 1 hour
+    return parseInt(match[1]) * (units[match[2]] || 1);
+  }
+
+  static verifyAccessToken(token: string): JWTPayload {
+    try {
+      return jwt.verify(token, EnvVariables.ACCESS_TOKEN_SECRET) as JWTPayload;
+    } catch (error) {
+      throw new ApiError(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
+    }
+  }
+}
