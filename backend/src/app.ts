@@ -11,6 +11,7 @@ const corsOptions = {
   origin: EnvVariables.CORS_ORIGIN || "http://localhost:5173",
   credentials: true,
   optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 };
 
 app.use(cors(corsOptions));
