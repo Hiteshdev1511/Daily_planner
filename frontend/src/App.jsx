@@ -12,7 +12,7 @@ export default function App({ children }) {
     if (!user && status === "idle") {
       dispatch(fetchCurrentUser());
     }
-  }, [dispatch,user,status]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (theme === "dark") {
