@@ -20,7 +20,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import InputTodo from "./InputTodo";
 import { useDetectOutsideClick } from "../hooks/useDetectOutsideClick";
-import { addNewProject } from "../features/project/projectSlice";
+import { createProject } from "../features/project/projectSlice";
+import { logoutUser } from "../features/user/userSlice";
 
 function NavLink({ icon, text, count, to = "" }) {
   const navigate = useNavigate();
@@ -84,21 +85,15 @@ function Projects() {
   const navigate = useNavigate();
   const [showAddProject, setShowAddProject] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
-  const projects = useSelector((state) => state.project);
+  const { projects } = useSelector((state) => state.project);
   const dispatch = useDispatch();
   const newProjRef = useRef(null);
 
   useDetectOutsideClick(newProjRef, () => setShowAddProject(false));
 
   function submitProjectHandler() {
-    let id = 4;
     if (!newProjectName || newProjectName.trim() === "") return;
-    const project = {
-      prjId: id++,
-      projectName: newProjectName,
-      todos: [],
-    };
-    dispatch(addNewProject(project));
+    dispatch(createProject({ title: newProjectName }));
     setShowAddProject(false);
   }
 
@@ -123,26 +118,38 @@ function Projects() {
             className="w-4 h-4 cursor-pointer hover:text-gray-800"
           />
           {showAddProject && (
-            <div className="fixed bg-white shadow-xl z-30 w-50 h-20 bottom-65 left-50 p-3 flex flex-col items-center justify-center rounded-xl">
-              <input
-                onChange={(e) => setNewProjectName(e.target.value)}
-                placeholder="Project"
-                type="text"
-                className="outline-none mb-2 border-1 rounded border-gray-300 placeholder:px-2"
-              />
-              <div className="flex items-center justify-evenly w-full">
-                <button
-                  onClick={() => setShowAddProject(false)}
-                  className="bg-gray-300 px-3 text-black rounded active:bg-gray-400"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={submitProjectHandler}
-                  className="bg-blue-500 px-3 text-white rounded active:bg-blue-600"
-                >
-                  Add
-                </button>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+              <div 
+                ref={newProjRef}
+                className="bg-white shadow-xl w-80 p-4 flex flex-col rounded-xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-lg font-bold mb-3">Add Project</h3>
+                <input
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  placeholder="Project Name"
+                  type="text"
+                  autoFocus
+                  className="outline-none mb-4 border border-gray-300 rounded p-2 focus:border-blue-500 transition-colors w-full"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') submitProjectHandler();
+                    if (e.key === 'Escape') setShowAddProject(false);
+                  }}
+                />
+                <div className="flex items-center justify-end space-x-3">
+                  <button
+                    onClick={() => setShowAddProject(false)}
+                    className="bg-gray-100 hover:bg-gray-200 px-4 py-2 text-gray-700 rounded transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={submitProjectHandler}
+                    className="bg-blue-500 hover:bg-blue-600 px-4 py-2 text-white rounded transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -152,15 +159,15 @@ function Projects() {
       <ul>
         {projects.map((project) => (
           <li
-            key={project.prjId}
-            onClick={() => navigate(`projects/${project.projectName}`)}
+            key={project._id || project.id}
+            onClick={() => navigate(`projects/${project._id || project.id}`)}
             className="flex items-center p-2 rounded-md text-orange-800 cursor-pointer text-sm hover:bg-blue-100"
           >
             <span className="font-bold">
               <Hash size="20" />
             </span>
             <span className="ml-3 font-semibold text-black">
-              {project.projectName}
+              {project.title}
             </span>
           </li>
         ))}
@@ -171,10 +178,11 @@ function Projects() {
 
 function SidebarHeader() {
   const userProfileRef = useRef();
-  const user = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
   useDetectOutsideClick(userProfileRef, () => setIsUserProfileOpen(false));
-  const userInitials = user.username?.charAt(0).toUpperCase() || "U";
+  const userInitials = user?.username?.charAt(0).toUpperCase() || "U";
   return (
     <header
       ref={userProfileRef}
@@ -202,17 +210,20 @@ function SidebarHeader() {
               </div>
               <div>
                 <div className="flex flex-col">
-                  <span className="font-bold">{user.fullName}</span>
-                  <span className="text-sm">{user.role}</span>
+                  <span className="font-bold">{user?.fullName}</span>
+                  <span className="text-sm">{user?.role}</span>
                 </div>
-                <span className="text-sm">{user.email}</span>
+                <span className="text-sm">{user?.email}</span>
               </div>
             </div>
             <div className="border-b-1 border-gray-200 h-15 flex flex-col justify-around text-gray-600">
               <div className="flex items-center hover:bg-gray-100 hover:rounded pl-2">
                 <Settings size="20" /> <span className="ml-1">Settings</span>
               </div>
-              <div className="flex items-center hover:bg-gray-100 hover:rounded pl-2">
+              <div 
+                className="flex items-center hover:bg-gray-100 hover:rounded pl-2 cursor-pointer"
+                onClick={() => dispatch(logoutUser())}
+              >
                 <LogOut size="20" /> <span className="ml-1">Logout</span>
               </div>
             </div>
@@ -277,9 +288,9 @@ function SidebarAddTaskBtn() {
 
       {isInputOpen && (
         <InputTodo
+          isModal={true}
           // Attach the ref for the hook to watch
           onCancel={() => setIsInputOpen(false)} // Allow closing from the component itself
-          styles="fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
         />
       )}
     </div>

@@ -4,6 +4,9 @@ import Logo from "../../components/Logo";
 import { Eye } from "lucide-react";
 import verifyInput from "../../utils/verifyInput";
 import { useNavigate } from "react-router-dom";
+import { authAPI } from "../../services/apiEndpoints";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../features/user/userSlice";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -13,61 +16,74 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-
   const [submitted, setSubmitted] = useState(false);
 
   const isInputInvalid = submitted && !input;
   const isPasswordInvalid = submitted && !password;
 
   const navigate = useNavigate();
-
-  function formSubmitHandler() {
-    setSubmitted(true);
-    if (verifyInput({ email, username, password })) {
-      try {
-        console.log("Verified");
-
-        setIsSubmitting(true);
-        setError(null);
-        console.log(
-          "simulate an api call Asynchromous function and send to the app page"
-        );
-        navigate("/");
-      } catch (error) {
-        setError(error);
-      } finally {
-        setIsSubmitting(false);
-      }
-    }
-  }
+  const dispatch = useDispatch();
 
   function checkInputType(input) {
     const result = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
-      input
+      input,
     );
     if (result) {
-      console.log("Input type is email");
       setEmail(input);
     } else {
       setUsername(input);
     }
   }
-  if (error) {
-    return <div>{error}</div>;
+
+  async function formSubmitHandler() {
+    setSubmitted(true);
+    if (!input || !password) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setError(null);
+
+      const loginData = {
+        ...(email ? { email } : {}),
+        ...(username ? { username } : {}),
+        password,
+      };
+
+      const response = await authAPI.login(loginData);
+      const { data } = response.data;
+
+      // Tokens are now handled via httpOnly cookies
+      dispatch(setUser(data.user));
+
+      navigate("/");
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "Login failed. Please try again.";
+      setError(errorMessage);
+      console.error("Login error:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <>
-      <section className="bg-gray-50">
-        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+      <section className="bg-gray-50 min-h-screen flex flex-col justify-center">
+        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto w-full md:w-auto">
           <Logo />
           <div className="w-full bg-white rounded-lg shadow dark:border mt-5 sm:max-w-md xl:p-0">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
                 {isSubmitting ? "Processing..." : "Login"}
               </h1>
+              {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                  <span className="block sm:inline">{error}</span>
+                </div>
+              )}
               <div className="space-y-4 md:space-y-6">
-                {/* Email and Username*/}
                 <div>
                   <label
                     htmlFor="input"
@@ -79,11 +95,13 @@ function Login() {
                     onChange={(e) => setInput(e.target.value)}
                     onBlur={() => checkInputType(input)}
                     type="text"
+                    value={input}
                     className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
                       isInputInvalid ? "border-red-500" : "border-gray-300"
                     }`}
                     placeholder="user@example.com"
                     required={true}
+                    disabled={isSubmitting}
                   />
                   {isInputInvalid && (
                     <p className="mt-1 text-sm text-red-600">
@@ -107,15 +125,18 @@ function Login() {
                     <input
                       type={showPassword ? "text" : "password"}
                       onChange={(e) => setPassword(e.target.value)}
+                      value={password}
                       placeholder={showPassword ? "4fjisjg8Phf*%" : "••••••••"}
-                      className="focus:outline-none h-full"
+                      className="focus:outline-none h-full w-full bg-transparent"
                       required
+                      disabled={isSubmitting}
                     />
 
                     <Eye
                       onClick={() => setShowPassword(!showPassword)}
                       color="grey"
                       size={"30"}
+                      className="cursor-pointer"
                     />
                   </div>
                   {isPasswordInvalid && (
@@ -131,6 +152,7 @@ function Login() {
                       name="remember-me"
                       type="checkbox"
                       className="h-4 w-4 shrink-0 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                      disabled={isSubmitting}
                     />
                     <label
                       htmlFor="remember-me"
@@ -141,7 +163,7 @@ function Login() {
                   </div>
                   <div className="text-sm">
                     <a
-                      href="/forget-password"
+                      href="/forgot-password"
                       className="text-blue-600 hover:underline font-semibold"
                     >
                       Forgot your password?
@@ -150,9 +172,10 @@ function Login() {
                 </div>
                 <button
                   onClick={formSubmitHandler}
-                  className="w-full text-white bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
+                  disabled={isSubmitting}
+                  className="w-full text-white bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Login
+                  {isSubmitting ? "Logging in..." : "Login"}
                 </button>
                 <div className="flex flex-col h-25 items-center justify-between">
                   <button className="flex items-center bg-white border border-gray-300 rounded-lg shadow-md w-full px-6 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none cursor-pointer active:bg-gray-300">

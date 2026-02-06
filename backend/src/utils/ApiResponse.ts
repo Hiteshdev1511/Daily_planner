@@ -1,4 +1,4 @@
-import { ApiResponseShape, HttpStatus } from "../types/index.js";
+import { ApiResponseShape, HttpStatus } from "../types/api";
 
 export class ApiResponse<TData = unknown, TMeta = unknown> implements ApiResponseShape<
   TData,

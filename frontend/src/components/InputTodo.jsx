@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { addTodo } from "../features/todo/todoSlice";
-import { addProject } from "../features/project/projectSlice";
 
 // --- MOCK DATA ---
 const DYNAMIC_PROJECTS = [{ prjId: 0, projectName: "Inbox" }];
@@ -40,10 +39,8 @@ const getPriorityStyles = (priority) => {
   }
 };
 
-const InputTodo = forwardRef(function InputTodo(
-  { styles = "", onCancel },
-  ref
-) {
+const InputTodo = forwardRef(function InputTodo(props, ref) {
+  const { styles = "", onCancel } = props;
   // --- STATE MANAGEMENT ---
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -55,7 +52,7 @@ const InputTodo = forwardRef(function InputTodo(
   const [showProjectDropdown, setShowProjectDropdown] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
 
-  const project = useSelector((state) => state.project);
+  const { projects: project } = useSelector((state) => state.project);
   const dispatch = useDispatch();
   // --- REFS for hidden inputs ---
   // To programmatically trigger the file inputs for date and time
@@ -69,7 +66,7 @@ const InputTodo = forwardRef(function InputTodo(
         month: "short",
         day: "2-digit",
         year: "numeric",
-      })
+      }),
     );
   };
 
@@ -87,32 +84,181 @@ const InputTodo = forwardRef(function InputTodo(
     setShowPriorityDropdown(false);
   };
   const handleSubmit = () => {
-    let id = 5;
-    // Basic validation
-    if (
-      [title, description, selectedDate].some(
-        (prop) => !prop || prop.trim() === ""
-      )
-    ) {
-      console.log("Please provide a valid fields");
+    // Basic validation - only title and date are required
+    if (!title || title.trim() === "" || !selectedDate) {
+      console.log("Please provide a valid title and date");
       return;
     }
 
     const taskData = {
-      id: id,
       title,
       description,
       time: selectedDate,
       priority: selectedPriority,
       isCompleted: false,
     };
-    dispatch(addTodo(taskData));
-    dispatch(addProject({ projectId: selectedProject.prjId, id: id++ }));
+    
+    // Ensure we have a valid project ID (default to Inbox or first project if not set)
+    // Assuming DYNAMIC_PROJECTS[0] is inbox, we might need a real ID for it from backend or handle it specically
+    const projectId = selectedProject._id || selectedProject.id || selectedProject.prjId; 
+
+    // If projectId is 0 (Inbox mock), checking if backend supports it. 
+    // For now assuming we have a selected project with ID.
+    // If selectedProject is the mock "Inbox" with ID 0, we might need to handle it.
+    // But let's dispatch what we have.
+    
+    dispatch(addTodo({ projectId, data: taskData }));
     onCancel();
-    console.log("Task added");
   };
 
   const priorityInfo = getPriorityStyles(selectedPriority);
+
+  if (props.isModal) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div
+          ref={ref}
+          className={`border border-gray-200 rounded-lg p-4 w-full max-w-xl shadow-2xl bg-white ${styles}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Top section: Title and Description inputs */}
+          <div className="flex flex-col space-y-1">
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter task title"
+              className="text-base text-gray-800 font-medium focus:outline-none placeholder:text-gray-500"
+              autoFocus
+            />
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter description"
+              className="text-sm text-gray-500 focus:outline-none placeholder:text-gray-500"
+            />
+          </div>
+
+          {/* Middle section: Action buttons with selected values displayed */}
+          <div className="flex items-center space-x-2 mt-3 relative">
+            {/* Date Button */}
+            <button
+              onClick={() => {
+                setShowCalendar(!showCalendar);
+              }}
+              className="flex items-center space-x-2 border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              <Calendar className="w-4 h-4" />
+              <span>{selectedDate || "Date"}</span>
+            </button>
+            {/* Hidden Date Input */}
+            {showCalendar && <input onChange={handleDateChange} type="date" />}
+
+            {/* Priority Button & Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}
+                className="flex items-center space-x-2 border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                {priorityInfo.icon}
+                <span>
+                  {selectedPriority ? `Priority ${selectedPriority}` : "Priority"}
+                </span>
+              </button>
+              {showPriorityDropdown && (
+                <div className="absolute top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                  {[1, 2, 3].map((p) => {
+                    const pInfo = getPriorityStyles(p);
+                    return (
+                      <div
+                        key={p}
+                        onClick={() => handlePrioritySelect(p)}
+                        className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                      >
+                        {pInfo.icon}
+                        <span>{pInfo.text}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Reminder Button */}
+            <button
+              onClick={() => reminderInputRef.current.click()}
+              className="flex items-center space-x-2 border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              <Bell className="w-4 h-4" />
+              <span>{selectedReminder || "Reminders"}</span>
+            </button>
+            {/* Hidden Time Input */}
+            <input
+              type="time"
+              ref={reminderInputRef}
+              onChange={handleReminderChange}
+              className="hidden"
+            />
+
+            {/* More Options Button */}
+            <button className="flex items-center justify-center border border-gray-300 rounded-md p-2 text-gray-600 hover:bg-gray-100 transition-colors">
+              <MoreHorizontal className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Separator and Bottom section */}
+          <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-200">
+            {/* Left side: Dynamic Project Selector */}
+            <div className="relative">
+              <button
+                onClick={() => setShowProjectDropdown(!showProjectDropdown)}
+                className="flex items-center space-x-2 border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                {selectedProject.projectName || selectedProject.title}
+                <ChevronDown />
+              </button>
+              {showProjectDropdown && (
+                <div className="absolute top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                  <div
+                    className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                    onClick={() => setSelectedProject(DYNAMIC_PROJECTS[0])}
+                  >
+                    <span>{DYNAMIC_PROJECTS[0].projectName}</span>
+                  </div>
+                  {project.map((proj) => (
+                    <div
+                      key={proj._id || proj.id}
+                      className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                      onClick={() => setSelectedProject(proj)}
+                    >
+                      <span>{proj.title}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right side: Cancel and Add Task buttons */}
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={onCancel}
+                className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="px-4 py-2 text-sm font-semibold text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
+              >
+                Add task
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     // Main container
@@ -214,7 +360,7 @@ const InputTodo = forwardRef(function InputTodo(
             onClick={() => setShowProjectDropdown(!showProjectDropdown)}
             className="flex items-center space-x-2 border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
           >
-            {selectedProject.projectName}
+            {selectedProject.projectName || selectedProject.title}
             <ChevronDown />
           </button>
           {showProjectDropdown && (
@@ -225,13 +371,13 @@ const InputTodo = forwardRef(function InputTodo(
               >
                 <span>{DYNAMIC_PROJECTS[0].projectName}</span>
               </div>
-              {project.map((project) => (
+              {project.map((proj) => (
                 <div
-                  key={project.prjId}
+                  key={proj._id || proj.id}
                   className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                  onClick={() => setSelectedProject(project)}
+                  onClick={() => setSelectedProject(proj)}
                 >
-                  <span>{project.projectName}</span>
+                  <span>{proj.title}</span>
                 </div>
               ))}
             </div>

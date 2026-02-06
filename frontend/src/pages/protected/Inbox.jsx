@@ -24,7 +24,7 @@ function Inbox() {
   const [isAddTaskInputOpen, setIsAddTaskInputOpen] = useState(false);
   const [todoList, setTodoList] = useState([]);
 
-  const todos = useSelector((state) => state.todo);
+  const { todos } = useSelector((state) => state.todo);
 
   useEffect(() => {
     setTodoList(todos.filter((todo)=>todo.isCompleted === false));

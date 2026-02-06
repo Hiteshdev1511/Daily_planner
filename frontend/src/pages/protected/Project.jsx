@@ -1,9 +1,10 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { InputTodo } from "../../components/index.js";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { TodoItem } from "../../components/index.js";
 import { useParams } from "react-router-dom";
+import { fetchTodos } from "../../features/todo/todoSlice";
 
 function Addtask({ func }) {
   return (
@@ -23,19 +24,24 @@ function Addtask({ func }) {
 
 function Project() {
   const [isAddTaskInputOpen, setIsAddTaskInputOpen] = useState(false);
-  const [todoIdList, setTodoIdList] = useState([]);
   const { projectName } = useParams();
+  const dispatch = useDispatch();
 
-  const project = useSelector((state) => state.project);
-  const todos = useSelector((state) => state.todo);
+  const { projects } = useSelector((state) => state.project);
+  const { todos, status: todoStatus } = useSelector((state) => state.todo);
+  
+  // Find project by name
+  const currentProject = projects.find((proj) => proj.title === projectName || proj.projectName === projectName);
 
   useEffect(() => {
-    const prj = project.find((proj) => proj.projectName === projectName);
-    console.log(project)
-    setTodoIdList(prj.todos);
-  }, [projectName, project]);
+    if (currentProject?._id) {
+      dispatch(fetchTodos(currentProject._id));
+    }
+  }, [currentProject, dispatch]);
 
-  console.log(todoIdList)
+  const projectTodos = todos; // Assuming fetchTodos clears/replaces todos in store. 
+  // If store keeps all todos, we might need filtering. But usually fetchTodos replaces the list or we filter by projectId.
+  // The slice implementation seemed to replace `state.todos = action.payload`. So `todos` is correct.
 
   return (
     <div className="flex flex-col justify-center items-center h-11/12">
@@ -43,11 +49,9 @@ function Project() {
         <h1 className="text-3xl font-bold flex justify-start">{projectName}</h1>
         {/* Main todos list */}
         <div>
-          {todoIdList.map((id) => {
-            const foundTodo = todos.find((todo) => todo.id === id || !todo.isCompleted);
-            console.log(foundTodo);
-            return <TodoItem key={id} todo={foundTodo} />;
-          })}
+          {projectTodos.map((todo) => (
+             <TodoItem key={todo._id} todo={todo} projectId={currentProject?._id} />
+          ))}
         </div>
         {/* Add task */}
         {isAddTaskInputOpen ? (

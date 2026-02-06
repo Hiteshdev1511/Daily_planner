@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { authAPI } from "../services/apiEndpoints";
 
 export const useIsUsernameUnique = (input) => {
   const [data, setData] = useState(null);
@@ -6,31 +7,32 @@ export const useIsUsernameUnique = (input) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-
-    if (!input) return;
+    if (!input) {
+      setData(null);
+      setLoading(false);
+      return;
+    }
 
     async function checkUniqueness() {
       setLoading(true);
       setError(null);
       try {
-        // backend api call simulating
-        const random = Math.random();
-        setTimeout(() => {
-          if (random > 0.5) {
-            setData(true);
-          } else {
-            setData(false);
-          }
-        }, 2000);
-      } catch (error) {
-        setError(error);
+        const response = await authAPI.checkUsernameUnique(input);
+        setData(response.data.data.isUnique);
+      } catch (err) {
+        setError(err?.response?.data?.message || err?.message || "Failed to check username");
+        setData(null);
       } finally {
         setLoading(false);
       }
     }
-    checkUniqueness();
 
-    return;
+    // Debounce the API call - wait 500ms after user stops typing
+    const timer = setTimeout(() => {
+      checkUniqueness();
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, [input]);
 
   return { data, error, loading };

@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: todo_app_db
+    environment:
+      POSTGRES_USER: todouser
+      POSTGRES_PASSWORD: todopass123
+      POSTGRES_DB: todo_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - todo_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todouser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: todo_app_backend
+    environment:
+      NODE_ENV: development
+      PORT: 8000
+      CORS_ORIGIN: http://localhost:3000
+      DIRECT_DATABASE_URL: postgresql://todouser:todopass123@postgres:5432/todo_db
+      DATABASE_URL: postgresql://todouser:todopass123@postgres:5432/todo_db
+      ACCESS_TOKEN_SECRET: dev_access_secret_key_change_in_production_min32
+      ACCESS_TOKEN_EXPIRY: 1h
+      REFRESH_TOKEN_SECRET: dev_refresh_secret_key_change_in_production_min32
+      REFRESH_TOKEN_EXPIRY: 7d
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - todo_network
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+
+volumes:
+  postgres_data:
+
+networks:
+  todo_network:
+    driver: bridge
