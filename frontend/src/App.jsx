@@ -5,11 +5,14 @@ import { fetchCurrentUser } from "./features/user/userSlice";
 // eslint-disable-next-line react/prop-types
 export default function App({ children }) {
   const { theme } = useSelector((state) => state.theme);
+  const { user, status } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchCurrentUser());
-  }, [dispatch]);
+    if (!user && status === "idle") {
+      dispatch(fetchCurrentUser());
+    }
+  }, [dispatch,user,status]);
 
   useEffect(() => {
     if (theme === "dark") {

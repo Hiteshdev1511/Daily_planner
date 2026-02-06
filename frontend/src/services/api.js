@@ -28,10 +28,6 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle 401 Unauthorized
-    if (error.response?.status === 401) {
-      window.location.href = "/login";
-    }
     return Promise.reject(error);
   },
 );

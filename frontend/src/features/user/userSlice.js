@@ -62,7 +62,7 @@ export const userSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
-        state.status = "failed";
+        state.status = "idle";
         state.error = action.payload;
       })
       // logoutUser
