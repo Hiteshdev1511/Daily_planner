@@ -3,6 +3,8 @@ import cors from "cors";
 import { EnvVariables } from "./types/common";
 import cookieParser from "cookie-parser";
 import errorHandler from "./utils/errorMiddleware";
+import { morganMiddleware } from "./lib/morgan";
+import { logger } from "./lib/logger";
 
 const app: Application = express();
 
@@ -14,7 +16,10 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 };
 
+// Middleware setup
 app.use(cors(corsOptions));
+app.use(logger.stream || (req, res, next) => next()); // Optional logging middleware
+app.use(morganMiddleware); // HTTP request logging
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));

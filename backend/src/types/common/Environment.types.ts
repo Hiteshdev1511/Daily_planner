@@ -5,6 +5,7 @@ configDotenv({ path: ".env" });
 export type Environment = "development" | "test" | "production";
 
 interface EnvConfig {
+  NODE_ENV: string;
   PORT: number;
   CORS_ORIGIN: string;
   DATABASE_URL: string;
@@ -16,6 +17,7 @@ interface EnvConfig {
 }
 
 export const EnvVariables: EnvConfig = {
+  NODE_ENV:process.env.NODE_ENV || "development",
   PORT: Number(process.env.PORT) || 4000,
   CORS_ORIGIN: process.env.CORS_ORIGIN || "",
   DATABASE_URL: process.env.DIRECT_DATABASE_URL || "",

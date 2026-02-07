@@ -23,13 +23,43 @@ api.interceptors.request.use(
 );
 
 // Response interceptor
+let isRefreshing = false;
+let queue = [];
+
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
+  res => res,
+  async error => {
+    const originalRequest = error.config;
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          queue.push({ resolve, reject });
+        }).then(() => api(originalRequest));
+      }
+
+      isRefreshing = true;
+
+      try {
+        await api.post("/auth/refresh");
+        queue.forEach(p => p.resolve());
+        queue = [];
+        return api(originalRequest);
+      } catch {
+        queue.forEach(p => p.reject());
+        queue = [];
+        throw error;
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
     return Promise.reject(error);
-  },
+  }
 );
 
-export default api;

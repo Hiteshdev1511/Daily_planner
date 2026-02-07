@@ -1,43 +1,48 @@
 import { EnvVariables } from "./types/common/Environment.types";
 import { client } from "./lib/prisma";
 import { app } from "./app";
+import { logger } from "./lib/logger";
 
 (async function () {
   try {
     await client.$connect();
+    logger.info("Database connected successfully");
 
     const server = app.listen(EnvVariables.PORT, () => {
-      console.log(`App running on http://localhost:${EnvVariables.PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+      logger.info(`App running on http://localhost:${EnvVariables.PORT}`);
+      logger.info(`Environment: ${process.env.NODE_ENV || "development"}`);
+      logger.info(`Server is ready to accept connections`);
     });
 
     // Graceful shutdown
     process.on("SIGTERM", () => {
-      console.log("SIGTERM signal received: closing HTTP server");
+      logger.warn("SIGTERM signal received: closing HTTP server");
       server.close(async () => {
-        console.log("HTTP server closed");
+        logger.info("HTTP server closed");
         await client.$disconnect();
-        console.log("Database disconnected");
+        logger.info("Database disconnected");
+        logger.info("Application gracefully shutdown");
         process.exit(0);
       });
     });
 
     process.on("SIGINT", () => {
-      console.log("SIGINT signal received: closing HTTP server");
+      logger.warn("SIGINT signal received: closing HTTP server");
       server.close(async () => {
-        console.log("HTTP server closed");
+        logger.info("HTTP server closed");
         await client.$disconnect();
-        console.log("Database disconnected");
+        logger.info("Database disconnected");
+        logger.info("Application gracefully shutdown");
         process.exit(0);
       });
     });
   } catch (error) {
-    console.error("Fatal error during application startup:");
+    logger.error("Fatal error during application startup:");
     if (error instanceof Error) {
-      console.error(error.message);
-      console.error(error.stack);
+      logger.error(`Error message: ${error.message}`);
+      logger.error(`Stack trace: ${error.stack}`);
     } else {
-      console.error(error);
+      logger.error(`Unexpected error: ${error}`);
     }
     process.exit(1);
   }
