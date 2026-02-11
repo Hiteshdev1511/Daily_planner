@@ -1,5 +1,5 @@
 import homeImage from "../../assets/home.jpg";
-import { Footer, Header, StickyVideo, Templates } from "../../components/index.js";
+import {  StickyVideo, Templates } from "../../components/index.js";
 
 function Home() {
   const bgImage =
@@ -7,9 +7,6 @@ function Home() {
 
   return (
     <>
-      <Header />
-      <main className="bg-white">
-        {/* Hero section */}
         <div className="flex p-20 justify-center">
           <div className="flex flex-col justify-evenly w-110 h-70 mt-4">
             <h1 className="font-bold text-5xl">Clarity, finally.</h1>
@@ -56,8 +53,6 @@ function Home() {
         {/* Scrollable Divs with Static video */}
         <StickyVideo />
         <Templates />
-      </main>
-      <Footer />
     </>
   );
 }

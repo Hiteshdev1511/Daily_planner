@@ -1,8 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit"
-import themeReducer from "../features/theme/themeSlice.js"
-import todoReducer from "../features/todo/todoSlice.js"
-import userReducer from "../features/user/userSlice.js"
-import projectReducer from "../features/project/projectSlice.js"
+import themeReducer from "./theme/themeSlice.js"
+import todoReducer from "./todo/todoSlice.js"
+import userReducer from "./user/userSlice.js"
+import projectReducer from "./project/projectSlice.js"
 
 export const store = configureStore({
     reducer: {

@@ -1,16 +1,16 @@
 import api from "./api";
 
 export const authAPI = {
-  register: (data) => api.post("/auth/register", data),
-  login: (data) => api.post("/auth/login", data),
+  register: (payload) => api.post("/auth/register", payload),
+  login: (payload) => api.post("/auth/login", payload),
   logout: () => api.post("/auth/logout"),
-  changePassword: (data) => api.post("/auth/change-password", data),
-  forgotPassword: (email) => api.post("/auth/forgot-password", { email }),
-  resetPassword: (token, newPassword) =>
-    api.post("/auth/reset-password", { token, newPassword }),
+  changePassword: (payload) => api.post("/auth/change-password", payload),
+  forgotPassword: (payload) => api.post("/auth/forgot-password", payload),
+  resetPassword: (payload) =>
+    api.post("/auth/reset-password", payload),
   refreshToken: () => api.post("/auth/refresh-token"),
-  checkUsernameUnique: (username) =>
-    api.get(`/auth/check-username?username=${username}`),
+  checkUsernameUnique: (payload) =>
+    api.get(`/auth/check-username?username=${payload}`),
 };
 
 export const userAPI = {

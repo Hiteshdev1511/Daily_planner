@@ -70,7 +70,7 @@ function Header() {
 
   function getStartedHandler() {
     if (!user) {
-      navigate("/signup");
+      navigate("/auth/signup");
     } else {
       navigate("/app");
     }
@@ -79,7 +79,7 @@ function Header() {
     dispatch(logoutUser())
       .unwrap()
       .then(() => {
-        navigate("/login");
+        navigate("/auth/login");
       });
   }
   return (
@@ -136,7 +136,7 @@ function Header() {
             Logout
           </button>
         ) : (
-          <NavLink href="/login">Login</NavLink>
+          <NavLink href="/auth/login">Login</NavLink>
         )}
 
         <div className="ml-4 h-10 px-5 text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center font-semibold rounded-lg">

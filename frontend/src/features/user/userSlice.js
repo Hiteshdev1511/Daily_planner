@@ -31,8 +31,8 @@ export const logoutUser = createAsyncThunk(
 );
 
 const initialState = {
-  user:null,
-  status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+  user:{},
+  status: "succeeded", // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
 };
 

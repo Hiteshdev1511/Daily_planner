@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { addTodo } from "../features/todo/todoSlice";
+import { useForm } from "react-hook-form";
 
 // --- MOCK DATA ---
 const DYNAMIC_PROJECTS = [{ prjId: 0, projectName: "Inbox" }];
@@ -41,6 +42,12 @@ const getPriorityStyles = (priority) => {
 
 const InputTodo = forwardRef(function InputTodo(props, ref) {
   const { styles = "", onCancel } = props;
+  const {
+    register,
+    watch,
+    handleSubmit,
+    formState: { errors, touchedFields },
+  } = useForm({ defaultValues: { title: "", description: "", deadline: "",priority:"1" } });
   // --- STATE MANAGEMENT ---
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -60,6 +67,7 @@ const InputTodo = forwardRef(function InputTodo(props, ref) {
 
   // --- EVENT HANDLERS ---
   const handleDateChange = (e) => {
+    console.log(e.target.value);
     const date = new Date(e.target.value);
     setSelectedDate(
       date.toLocaleDateString("en-US", {
@@ -83,7 +91,8 @@ const InputTodo = forwardRef(function InputTodo(props, ref) {
     setSelectedPriority(priority);
     setShowPriorityDropdown(false);
   };
-  const handleSubmit = () => {
+
+  const formSubmitHandler = (data) => {
     // Basic validation - only title and date are required
     if (!title || title.trim() === "" || !selectedDate) {
       console.log("Please provide a valid title and date");
@@ -97,16 +106,17 @@ const InputTodo = forwardRef(function InputTodo(props, ref) {
       priority: selectedPriority,
       isCompleted: false,
     };
-    
+
     // Ensure we have a valid project ID (default to Inbox or first project if not set)
     // Assuming DYNAMIC_PROJECTS[0] is inbox, we might need a real ID for it from backend or handle it specically
-    const projectId = selectedProject._id || selectedProject.id || selectedProject.prjId; 
+    const projectId =
+      selectedProject._id || selectedProject.id || selectedProject.prjId;
 
-    // If projectId is 0 (Inbox mock), checking if backend supports it. 
+    // If projectId is 0 (Inbox mock), checking if backend supports it.
     // For now assuming we have a selected project with ID.
     // If selectedProject is the mock "Inbox" with ID 0, we might need to handle it.
     // But let's dispatch what we have.
-    
+
     dispatch(addTodo({ projectId, data: taskData }));
     onCancel();
   };
@@ -121,140 +131,179 @@ const InputTodo = forwardRef(function InputTodo(props, ref) {
           className={`border border-gray-200 rounded-lg p-4 w-full max-w-xl shadow-2xl bg-white ${styles}`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Top section: Title and Description inputs */}
-          <div className="flex flex-col space-y-1">
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter task title"
-              className="text-base text-gray-800 font-medium focus:outline-none placeholder:text-gray-500"
-              autoFocus
-            />
-            <input
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter description"
-              className="text-sm text-gray-500 focus:outline-none placeholder:text-gray-500"
-            />
-          </div>
+          <form onSubmit={handleSubmit(formSubmitHandler)}>
+            {/* Top section: Title and Description inputs */}
+            <div className="flex flex-col space-y-1">
+              <input
+                type="text"
+                placeholder="Enter task title"
+                className={`text-base text-gray-800 font-medium focus:outline-none placeholder:text-gray-500`}
+                autoFocus
+                {...register("title", {
+                  required: "Title is required",
+                  pattern: {
+                    value: /\S/,
+                    message: "Title cannot contain only spaces",
+                  },
+                })}
+              />
+              {errors.title && (
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.title.message}
+                </p>
+              )}
+              <input
+                type="text"
+                placeholder="Enter description"
+                className="text-sm text-gray-500 focus:outline-none placeholder:text-gray-500"
+                {...register("description", {
+                  required: "Description is required",
+                  pattern: {
+                    value: /\S/,
+                    message: "Description cannot contain only space",
+                  },
+                })}
+              />
+              {errors.description && (
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.description.message}
+                </p>
+              )}
+            </div>
 
-          {/* Middle section: Action buttons with selected values displayed */}
-          <div className="flex items-center space-x-2 mt-3 relative">
-            {/* Date Button */}
-            <button
-              onClick={() => {
-                setShowCalendar(!showCalendar);
-              }}
-              className="flex items-center space-x-2 border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
-            >
-              <Calendar className="w-4 h-4" />
-              <span>{selectedDate || "Date"}</span>
-            </button>
-            {/* Hidden Date Input */}
-            {showCalendar && <input onChange={handleDateChange} type="date" />}
-
-            {/* Priority Button & Dropdown */}
-            <div className="relative">
+            {/* Middle section: Action buttons with selected values displayed */}
+            <div className="flex items-center space-x-2 mt-3 relative">
+              {/* Date Button */}
               <button
-                onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}
+                onClick={() => {
+                  setShowCalendar(!showCalendar);
+                }}
                 className="flex items-center space-x-2 border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
               >
-                {priorityInfo.icon}
-                <span>
-                  {selectedPriority ? `Priority ${selectedPriority}` : "Priority"}
-                </span>
+                <Calendar className="w-4 h-4" />
+                <span>{selectedDate || "Date"}</span>
               </button>
-              {showPriorityDropdown && (
-                <div className="absolute top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-                  {[1, 2, 3].map((p) => {
-                    const pInfo = getPriorityStyles(p);
-                    return (
-                      <div
-                        key={p}
-                        onClick={() => handlePrioritySelect(p)}
-                        className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                      >
-                        {pInfo.icon}
-                        <span>{pInfo.text}</span>
-                      </div>
-                    );
+              {/* Hidden Date Input */}
+              {showCalendar && (
+                <input
+                  type="date"
+                  {...register("deadline", {
+                    required: "Date field is required",
+                    pattern: {
+                      value: /^\d{4}-\d{2}-\d{2}$/,
+                      message: "Date format is invalid",
+                    },
                   })}
-                </div>
+                />
               )}
-            </div>
+              {errors.deadline && (
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.deadline.message}
+                </p>
+              )}
+              {/* Priority Button & Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}
+                  className="flex items-center space-x-2 border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+                >
+                  {priorityInfo.icon}
+                  <span>
+                    {selectedPriority
+                      ? `Priority ${selectedPriority}`
+                      : "Priority"}
+                  </span>
+                </button>
+                {showPriorityDropdown && (
+                  <div className="absolute top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                    {[1, 2, 3].map((p) => {
+                      const pInfo = getPriorityStyles(p);
+                      return (
+                        <div
+                          key={p}
+                          onClick={() => handlePrioritySelect(p)}
+                          className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                        >
+                          {pInfo.icon}
+                          <span>{pInfo.text}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
 
-            {/* Reminder Button */}
-            <button
-              onClick={() => reminderInputRef.current.click()}
-              className="flex items-center space-x-2 border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
-            >
-              <Bell className="w-4 h-4" />
-              <span>{selectedReminder || "Reminders"}</span>
-            </button>
-            {/* Hidden Time Input */}
-            <input
-              type="time"
-              ref={reminderInputRef}
-              onChange={handleReminderChange}
-              className="hidden"
-            />
-
-            {/* More Options Button */}
-            <button className="flex items-center justify-center border border-gray-300 rounded-md p-2 text-gray-600 hover:bg-gray-100 transition-colors">
-              <MoreHorizontal className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Separator and Bottom section */}
-          <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-200">
-            {/* Left side: Dynamic Project Selector */}
-            <div className="relative">
+              {/* Reminder Button */}
               <button
-                onClick={() => setShowProjectDropdown(!showProjectDropdown)}
+                onClick={() => reminderInputRef.current.click()}
                 className="flex items-center space-x-2 border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
               >
-                {selectedProject.projectName || selectedProject.title}
-                <ChevronDown />
+                <Bell className="w-4 h-4" />
+                <span>{selectedReminder || "Reminders"}</span>
               </button>
-              {showProjectDropdown && (
-                <div className="absolute top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-                  <div
-                    className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                    onClick={() => setSelectedProject(DYNAMIC_PROJECTS[0])}
-                  >
-                    <span>{DYNAMIC_PROJECTS[0].projectName}</span>
-                  </div>
-                  {project.map((proj) => (
-                    <div
-                      key={proj._id || proj.id}
-                      className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                      onClick={() => setSelectedProject(proj)}
-                    >
-                      <span>{proj.title}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {/* Hidden Time Input */}
+              <input
+                type="time"
+                ref={reminderInputRef}
+                onChange={handleReminderChange}
+                className="hidden"
+              />
+
+              {/* More Options Button */}
+              <button className="flex items-center justify-center border border-gray-300 rounded-md p-2 text-gray-600 hover:bg-gray-100 transition-colors">
+                <MoreHorizontal className="w-4 h-4" />
+              </button>
             </div>
 
-            {/* Right side: Cancel and Add Task buttons */}
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={onCancel}
-                className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="px-4 py-2 text-sm font-semibold text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
-              >
-                Add task
-              </button>
+            {/* Separator and Bottom section */}
+            <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-200">
+              {/* Left side: Dynamic Project Selector */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowProjectDropdown(!showProjectDropdown)}
+                  className="flex items-center space-x-2 border border-gray-300 rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+                >
+                  {selectedProject.projectName || selectedProject.title}
+                  <ChevronDown />
+                </button>
+                {showProjectDropdown && (
+                  <div className="absolute top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                    <div
+                      className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                      onClick={() => setSelectedProject(DYNAMIC_PROJECTS[0])}
+                    >
+                      <span>{DYNAMIC_PROJECTS[0].projectName}</span>
+                    </div>
+                    {project.map((proj) => (
+                      <div
+                        key={proj._id || proj.id}
+                        className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                        onClick={() => setSelectedProject(proj)}
+                      >
+                        <span>{proj.title}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Right side: Cancel and Add Task buttons */}
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={onCancel}
+                  className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-semibold text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
+                >
+                  Add task
+                </button>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     );

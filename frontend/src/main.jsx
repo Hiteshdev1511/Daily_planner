@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
-import "./App.css"
+import "./App.css";
 import App from "./App.jsx";
-import { store } from "./store/store.js";
+import { store } from "./features/store";
 import { Provider } from "react-redux";
 import Routes from "./Routes.jsx";
 
@@ -10,5 +10,5 @@ createRoot(document.getElementById("root")).render(
     <App>
       <Routes />
     </App>
-  </Provider>
+  </Provider>,
 );

@@ -33,6 +33,7 @@ model User {
   refreshToken        String?
   passwordResetToken  String?
   passwordResetExpiry DateTime?
+  isUserVerified      Boolean @default(false)
   createdAt           DateTime @default(now())
   updatedAt           DateTime? 
 

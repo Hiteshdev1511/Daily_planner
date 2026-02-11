@@ -132,6 +132,7 @@ export const refreshAccessToken = asyncHandler(
       );
   },
 );
+
 export const checkUsernameUnique = asyncHandler(
   async (req: Request, res: Response) => {
     const { username } = req.query;

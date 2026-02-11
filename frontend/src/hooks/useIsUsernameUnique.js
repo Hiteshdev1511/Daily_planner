@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { authAPI } from "../services/apiEndpoints";
 
-export const useIsUsernameUnique = (input) => {
+export const useIsUsernameUnique = (username) => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!input) {
+    if (!username) {
       setData(null);
       setLoading(false);
       return;
@@ -17,7 +17,7 @@ export const useIsUsernameUnique = (input) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await authAPI.checkUsernameUnique(input);
+        const response = await authAPI.checkUsernameUnique({username});
         setData(response.data.data.isUnique);
       } catch (err) {
         setError(err?.response?.data?.message || err?.message || "Failed to check username");
@@ -33,7 +33,7 @@ export const useIsUsernameUnique = (input) => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [input]);
+  }, [username]);
 
   return { data, error, loading };
 };

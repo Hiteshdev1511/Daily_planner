@@ -33,7 +33,7 @@ function ResetPassword() {
     e.preventDefault();
     setSubmitted(true);
 
-    if (!password || !confPassword || password !== confPassword) {
+    if (!password.trim() || !confPassword.trim() || password !== confPassword) {
       return;
     }
 
@@ -46,11 +46,11 @@ function ResetPassword() {
       setIsSubmitting(true);
       setError(null);
 
-      await authAPI.resetPassword(token, password);
+      await authAPI.resetPassword({token, password});
       setSuccess(true);
 
       setTimeout(() => {
-        navigate("/login");
+        navigate("/auth/login");
       }, 2000);
     } catch (err) {
       const errorMessage =
@@ -117,7 +117,6 @@ function ResetPassword() {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder={showPassword ? "password123" : "••••••••"}
                         className="focus:outline-none h-full w-full bg-transparent"
-                        required
                         disabled={isSubmitting}
                       />
                       <Eye
@@ -153,7 +152,6 @@ function ResetPassword() {
                           ? "border-red-500"
                           : "border-gray-300"
                       }`}
-                      required
                       disabled={isSubmitting}
                     />
                     {isConfPasswordInvalid && (
@@ -174,7 +172,7 @@ function ResetPassword() {
                   <div className="text-center">
                     <p className="text-sm text-gray-600">
                       <a
-                        href="/login"
+                        href="/auth/login"
                         className="text-blue-600 hover:underline font-semibold"
                       >
                         Back to Login
@@ -188,7 +186,7 @@ function ResetPassword() {
                 <div className="text-center">
                   <p className="text-sm text-gray-600">
                     <a
-                      href="/login"
+                      href="/auth/login"
                       className="text-blue-600 hover:underline font-semibold"
                     >
                       Back to Login
@@ -201,7 +199,7 @@ function ResetPassword() {
                 <div className="text-center">
                   <p className="text-sm text-gray-600">
                     <a
-                      href="/forgot-password"
+                      href="/auth/forgot-password"
                       className="text-blue-600 hover:underline font-semibold"
                     >
                       Request a new reset link

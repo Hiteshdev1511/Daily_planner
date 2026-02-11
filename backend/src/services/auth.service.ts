@@ -100,10 +100,7 @@ export class AuthService {
     }
 
     // Verify password
-    const isPasswordValid = await bcrypt.compare(
-      data.password,
-      user.password,
-    );
+    const isPasswordValid = await bcrypt.compare(data.password, user.password);
     if (!isPasswordValid) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
@@ -271,10 +268,11 @@ export class AuthService {
   private static async sendResetEmail(email: string, resetUrl: string) {
     try {
       const transporter = nodemailer.createTransport({
-        service: "gmail", // You can configure this in env
+        host: "sandbox.smtp.mailtrap.io",
+        port: 2525,
         auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASSWORD,
+          user: EnvVariables.EMAIL_USER,
+          pass: EnvVariables.EMAIL_PASSWORD,
         },
       });
 

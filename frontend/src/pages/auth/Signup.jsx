@@ -1,81 +1,69 @@
 import { useState } from "react";
 import Logo from "../../components/Logo";
 import { Eye } from "lucide-react";
-import verifyInput from "../../utils/verifyInput";
 import { useIsUsernameUnique } from "../../hooks/useIsUsernameUnique";
 import { useNavigate } from "react-router-dom";
 import { authAPI } from "../../services/apiEndpoints";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../features/user/userSlice";
+import { useForm } from "react-hook-form";
 
 function Signup() {
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
-  const [password, setPassword] = useState("");
-  const [confPassword, setConfPassword] = useState("");
+  const {
+    register,
+    watch,
+    handleSubmit,
+    formState: { errors, touchedFields },
+  } = useForm({
+    defaultValues: {
+      email: "",
+      username: "",
+      firstname: "",
+      lastname: "",
+      dob: "",
+      gender: "",
+      password: "",
+      confPassword: "",
+    },
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { data: isUsernameUnique } = useIsUsernameUnique(username);
+  const { data: isUsernameUnique } = useIsUsernameUnique(watch("username"));
 
-  const isEmailInvalid = submitted && !email;
-  const isUsernameInvalid = submitted && !username;
-  const isFirstnameInvalid = submitted && !firstname;
-  const isDobInvalid = submitted && !dob;
-  const isGenderInvalid = submitted && !gender;
-  const isPasswordInvalid = submitted && !password;
-  const isConfPasswordInvalid =
-    submitted && (!confPassword || password !== confPassword);
+  async function formSubmitHandler(data) {
+    try {
+      setIsSubmitting(true);
+      setError(null);
 
-  async function formSubmitHandler() {
-    setSubmitted(true);
+      const { email, username, firstname, lastname, dob, gender, password } =
+        data;
 
-    if (
-      verifyInput({ email, username, confPassword, password }, "signin") &&
-      isUsernameUnique &&
-      firstname &&
-      dob &&
-      gender
-    ) {
-      try {
-        setIsSubmitting(true);
-        setError(null);
+      const response = await authAPI.register({
+        email,
+        username,
+        firstname,
+        lastname,
+        dob,
+        gender,
+        password,
+      });
+      const user = response.data.data;
 
-        const signupData = {
-          email,
-          username,
-          password,
-          firstname,
-          lastname,
-          dob: new Date(dob),
-          gender,
-        };
+      // Tokens are now handled via httpOnly cookies
+      dispatch(setUser(user));
 
-        const response = await authAPI.register(signupData);
-        const { data } = response.data;
-
-        // Tokens are now handled via httpOnly cookies
-        dispatch(setUser(data.user));
-
-        navigate("/");
-      } catch (err) {
-        const errorMessage =
-          err.response?.data?.message || "Signup failed. Please try again.";
-        setError(errorMessage);
-        console.error("Signup error:", err);
-      } finally {
-        setIsSubmitting(false);
-      }
-    } else {
-      console.log("Validation failed.");
+      navigate("/");
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "Signup failed. Please try again.";
+      setError(errorMessage);
+      console.error("Signup error:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -94,7 +82,10 @@ function Signup() {
                   <span className="block sm:inline">{error}</span>
                 </div>
               )}
-              <div className="space-y-4 md:space-y-6">
+              <form
+                className="space-y-4 md:space-y-6"
+                onSubmit={handleSubmit(formSubmitHandler)}
+              >
                 {/* Email Input */}
                 <div>
                   <label
@@ -104,19 +95,26 @@ function Signup() {
                     Email
                   </label>
                   <input
-                    onChange={(e) => setEmail(e.target.value)}
-                    value={email}
                     type="email"
                     className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
-                      isEmailInvalid ? "border-red-500" : "border-gray-300"
+                      touchedFields.email && errors.email
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
                     placeholder="name@company.com"
-                    required={true}
                     disabled={isSubmitting}
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value:
+                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                        message: "Invalid email format",
+                      },
+                    })}
                   />
-                  {isEmailInvalid && (
+                  {errors.email && (
                     <p className="mt-1 text-sm text-red-600">
-                      Please enter a valid email address.
+                      {errors.email.message}
                     </p>
                   )}
                 </div>
@@ -130,19 +128,25 @@ function Signup() {
                     First Name
                   </label>
                   <input
-                    onChange={(e) => setFirstname(e.target.value)}
-                    value={firstname}
                     type="text"
                     className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
-                      isFirstnameInvalid ? "border-red-500" : "border-gray-300"
+                      touchedFields.firstname && errors.firstname
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
                     placeholder="John"
-                    required
                     disabled={isSubmitting}
+                    {...register("firstname", {
+                      required: "First name is required",
+                      pattern: {
+                        value: /\S/,
+                        message: "Firstname cannot be empty",
+                      },
+                    })}
                   />
-                  {isFirstnameInvalid && (
+                  {errors.firstname && (
                     <p className="mt-1 text-sm text-red-600">
-                      First name is required.
+                      {errors.firstname.message}
                     </p>
                   )}
                 </div>
@@ -156,12 +160,11 @@ function Signup() {
                     Last Name (Optional)
                   </label>
                   <input
-                    onChange={(e) => setLastname(e.target.value)}
-                    value={lastname}
                     type="text"
                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     placeholder="Doe"
                     disabled={isSubmitting}
+                    {...register("lastname")}
                   />
                 </div>
 
@@ -174,18 +177,20 @@ function Signup() {
                     Date of Birth
                   </label>
                   <input
-                    onChange={(e) => setDob(e.target.value)}
-                    value={dob}
                     type="date"
                     className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
-                      isDobInvalid ? "border-red-500" : "border-gray-300"
+                      errors.dob && touchedFields.dob
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
-                    required
                     disabled={isSubmitting}
+                    {...register("dob", {
+                      required: "Date of Birth is required",
+                    })}
                   />
-                  {isDobInvalid && (
+                  {errors.dob && (
                     <p className="mt-1 text-sm text-red-600">
-                      Date of birth is required.
+                      {errors.dob.message}
                     </p>
                   )}
                 </div>
@@ -199,22 +204,24 @@ function Signup() {
                     Gender
                   </label>
                   <select
-                    onChange={(e) => setGender(e.target.value)}
-                    value={gender}
                     className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
-                      isGenderInvalid ? "border-red-500" : "border-gray-300"
+                      touchedFields.gender && errors.gender
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
-                    required
                     disabled={isSubmitting}
+                    {...register("gender", {
+                      required: "Gender is required",
+                    })}
                   >
                     <option value="">Select Gender</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="other">Other</option>
                   </select>
-                  {isGenderInvalid && (
+                  {errors.gender && (
                     <p className="mt-1 text-sm text-red-600">
-                      Gender is required.
+                      {errors.gender.message}
                     </p>
                   )}
                 </div>
@@ -228,26 +235,31 @@ function Signup() {
                     Username
                   </label>
                   <input
-                    onChange={(e) => setUsername(e.target.value)}
-                    value={username}
                     type="text"
                     className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
-                      isUsernameInvalid || (!isUsernameUnique && username != "")
+                      (touchedFields.username && errors.username) ||
+                      (!isUsernameUnique && watch("username") !== "")
                         ? "border-red-500"
                         : "border-gray-300"
                     }`}
                     placeholder="Unique username"
-                    required
                     disabled={isSubmitting}
+                    {...register("username", {
+                      required: "Username is required",
+                      pattern: {
+                        value: /\S/,
+                        message: "White spaces are not allowed",
+                      },
+                    })}
                   />
-                  {!isUsernameUnique && username != "" && (
+                  {!isUsernameUnique && watch("username") !== "" && (
                     <p className="mt-1 text-sm text-red-600">
                       Username is already taken.
                     </p>
                   )}
-                  {isUsernameInvalid && (
+                  {errors.username && (
                     <p className="text-sm text-red-600">
-                      Username cannot be empty.
+                      {errors.username.message}
                     </p>
                   )}
                 </div>
@@ -262,19 +274,26 @@ function Signup() {
                   </label>
                   <div
                     className={`flex items-center justify-between bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 w-full p-2.5 ${
-                      isPasswordInvalid ? "border-red-500" : "border-gray-300"
+                      touchedFields.password && errors.password
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
                   >
                     <input
-                      onChange={(e) => setPassword(e.target.value)}
-                      value={password}
                       type={showPassword ? "text" : "password"}
                       placeholder={
                         showPassword ? "igq48#$P2asd" : "************"
                       }
                       className="focus:outline-none h-full w-full bg-transparent"
-                      required={true}
                       disabled={isSubmitting}
+                      {...register("password", {
+                        required: "Password is required",
+                        pattern: {
+                          value: /^[^ \t]+$/,
+                          message: "Password cannot contain whitespaces",
+                        },
+                        minLength: 8,
+                      })}
                     />
                     <Eye
                       size={"30"}
@@ -283,9 +302,9 @@ function Signup() {
                       className="cursor-pointer"
                     />
                   </div>
-                  {isPasswordInvalid && (
+                  {errors.password && (
                     <p className="mt-1 text-sm text-red-600">
-                      Password field can not be empty
+                      {errors.password.message}
                     </p>
                   )}
                 </div>
@@ -300,31 +319,43 @@ function Signup() {
                   </label>
                   <div
                     className={`flex items-center justify-between bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 w-full p-2.5 ${
-                      isConfPasswordInvalid
+                      touchedFields.confPassword && errors.confPassword
                         ? "border-red-500"
                         : "border-gray-300"
                     }`}
                   >
                     <input
-                      onChange={(e) => setConfPassword(e.target.value)}
-                      value={confPassword}
                       type="password"
                       placeholder="************"
-                      required={true}
                       disabled={isSubmitting}
                       className="focus:outline-none h-full w-full bg-transparent"
+                      {...register("confPassword", {
+                        required: "Confirm password is required",
+                        pattern: {
+                          value: /^[^ \t]+$/,
+                          message:
+                            "Confirm password cannot contain whitespaces",
+                        },
+                        validate: {
+                          checkCorrectness: (confPassword, { password }) => {
+                            if (confPassword !== password) {
+                              return "Confirm password must be same as password";
+                            }
+                          },
+                        },
+                      })}
                     />
                   </div>
-                  {isConfPasswordInvalid && (
+                  {errors.confPassword && (
                     <p className="mt-1 text-sm text-red-600">
-                      Passwords do not match
+                      {errors.confPassword.message}
                     </p>
                   )}
                 </div>
 
                 {/* ... (button and other fields) */}
                 <button
-                  onClick={formSubmitHandler}
+                  type="submit"
                   disabled={isSubmitting}
                   className="w-full text-white bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -426,13 +457,13 @@ function Signup() {
                 <p className="text-sm font-light text-gray-500">
                   Already have an account{" "}
                   <a
-                    href="/login"
+                    href="/auth/login"
                     className="font-medium text-primary-600 hover:underline "
                   >
                     Sign in
                   </a>
                 </p>
-              </div>
+              </form>
             </div>
           </div>
         </div>

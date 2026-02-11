@@ -1,18 +1,12 @@
 import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { fetchCurrentUser } from "./features/user/userSlice";
+import { useSelector } from "react-redux";
+import { useFetchCurrentUser } from "./hooks/useFetchCurrentUser";
 
 // eslint-disable-next-line react/prop-types
 export default function App({ children }) {
   const { theme } = useSelector((state) => state.theme);
-  const { user, status } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (!user && status === "idle") {
-      dispatch(fetchCurrentUser());
-    }
-  }, [dispatch]);
+  useFetchCurrentUser();
 
   useEffect(() => {
     if (theme === "dark") {
