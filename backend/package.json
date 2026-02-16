@@ -6,7 +6,8 @@
   "scripts": {
     "prebuild": "prisma generate",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "dev":"tsx watch src/server.ts"
   },
   "keywords": [
     "todo",

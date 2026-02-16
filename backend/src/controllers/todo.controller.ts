@@ -24,11 +24,11 @@ export const createTodo = asyncHandler(async (req: Request, res: Response) => {
       : req.params.projectId[0];
   const validatedData = validateCreateTodo(req.body);
 
-  const result = await TodoService.createTodo(
-    req.user.id,
-    projectId,
-    validatedData,
-  );
+  const result = await TodoService.createTodo(req.user.id, projectId, {
+    title: validatedData.title,
+    description: validatedData.description,
+    deadline: new Date(validatedData.deadline as string),
+  });
 
   res
     .status(HttpStatus.CREATED)
@@ -42,17 +42,19 @@ export const createTodo = asyncHandler(async (req: Request, res: Response) => {
  */
 export const getProjectTodos = asyncHandler(
   async (req: Request, res: Response) => {
-    const projectId =
-      typeof req.params.projectId === "string"
-        ? req.params.projectId
-        : req.params.projectId[0];
+    const { projectId } = req.params;
 
-    const result = await TodoService.getProjectTodos(projectId);
+    const prjId = Array.isArray(projectId) ? projectId[0] : projectId;
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    const result = await TodoService.getProjectTodos(prjId, page, limit);
 
     res
       .status(HttpStatus.OK)
       .json(
-        new ApiResponse(HttpStatus.OK, "Todos retrieved successfully", result),
+        new ApiResponse(HttpStatus.OK, "Todos of Project retrieved successfully", result),
       );
   },
 );
@@ -71,7 +73,7 @@ export const getTodoById = asyncHandler(async (req: Request, res: Response) => {
   res
     .status(HttpStatus.OK)
     .json(
-      new ApiResponse(HttpStatus.OK, "Todo retrieved successfully", result),
+      new ApiResponse(HttpStatus.OK, "Single todo retrieved successfully", result),
     );
 });
 
@@ -146,7 +148,7 @@ export const changeDeadline = asyncHandler(
     const result = await TodoService.changeDeadline(
       todoId,
       req.user.id,
-      validatedData.deadline,
+      new Date(validatedData.deadline as string),
     );
 
     res
@@ -176,3 +178,21 @@ export const deleteTodo = asyncHandler(async (req: Request, res: Response) => {
     .status(HttpStatus.OK)
     .json(new ApiResponse(HttpStatus.OK, "Todo deleted successfully", result));
 });
+
+/**
+ * Get all todos of the user
+ */
+export const getUserTodos = asyncHandler(
+  async (req: Request, res: Response) => {
+    if (!req.user?.id) {
+      throw new ApiError(HttpStatus.UNAUTHORIZED, "User not authenticated");
+    }
+    const result = await TodoService.getUserTodos(req.user?.id);
+
+    res
+      .status(HttpStatus.OK)
+      .json(
+        new ApiResponse(HttpStatus.OK, "Todos fetched succesfully", result),
+      );
+  },
+);

@@ -3,7 +3,7 @@ import { useState } from "react";
 import Logo from "../../components/Logo";
 import { Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { authAPI } from "../../services/apiEndpoints";
+import { useLoginMutation } from "../../features/auth/authApiSlice";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../features/user/userSlice";
 import { useForm } from "react-hook-form";
@@ -15,9 +15,9 @@ function Login() {
     watch,
     formState: { errors, touchedFields },
   } = useForm({ defaultValues: { input: "", password: "" } });
-  const [inputType, setInputType] = useState("email");
+  const [inputType, setInputType] = useState("username");
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [login, { isLoading: isSubmitting }] = useLoginMutation();
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
@@ -37,7 +37,6 @@ function Login() {
 
   async function formSubmitHandler(data) {
     try {
-      setIsSubmitting(true);
       setError(null);
 
       const loginData = {
@@ -45,20 +44,24 @@ function Login() {
         password:data.password,
       };
 
-      const response = await authAPI.login({...loginData});
-      const user = response.data.data;
+      const response = await login(loginData).unwrap();
+      const user = response.data.user;
 
       // Tokens are now handled via httpOnly cookies
-      dispatch(setUser(user));
-
+      // User is already set in store by onQueryStarted in authApiSlice, 
+      // but if we want to be explicit or if we removed that logic:
+      // dispatch(setUser(user)); 
+      // Actually authApiSlice handles dispatch(setUser), but let's leave it if needed or remove it.
+      // The authApiSlice I wrote does dispatch setUser. So we don't strictly need it here, 
+      // but it doesn't hurt to be safe or just rely on the slice.
+      // Let's rely on the slice logic I wrote or just navigation.
+      
       navigate("/");
     } catch (err) {
       const errorMessage =
-        err.response?.data?.message || "Login failed. Please try again.";
+        err.data?.message || "Login failed. Please try again.";
       setError(errorMessage);
       console.error("Login error:", err);
-    } finally {
-      setIsSubmitting(false);
     }
   }
 

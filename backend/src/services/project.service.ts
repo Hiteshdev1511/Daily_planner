@@ -20,10 +20,11 @@ export class ProjectService {
         title: data.title,
         ownerId: userId,
       },
-      include: {
-        owner: true,
-        todos: true,
-        collaborators: true,
+      select: {
+        id: true,
+        title: true,
+
+        owner: { select: { id: true, username: true } },
       },
     });
 
@@ -36,14 +37,20 @@ export class ProjectService {
   static async getProjectById(projectId: string) {
     const project = await client.project.findUnique({
       where: { id: projectId },
-      include: {
-        owner: true,
-        todos: true,
-        collaborators: {
-          include: {
-            user: true,
+      select: {
+        id: true,
+        title: true,
+        ownerId: true,
+        todos: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            deadline: true,
+            isCompleted: true,
           },
         },
+        collaborators: { select: { role: true, userId: true } },
       },
     });
 
@@ -57,28 +64,77 @@ export class ProjectService {
   /**
    * Get all projects for a user
    */
-  static async getUserProjects(userId: string) {
-    const projects = await client.project.findMany({
-      where: {
-        OR: [
-          { ownerId: userId },
-          {
-            collaborators: {
-              some: {
-                userId: userId,
+  static async getUserProjects(
+    userId: string,
+    page: number = 1,
+    limit: number = 20,
+  ) {
+    // Validate pagination parameters
+    const pageNum = Math.max(1, page);
+    const limitNum = Math.min(limit, 100); // Max 100 items per page
+    const skip = (pageNum - 1) * limitNum;
+
+    // Get projects with pagination
+    const [projects, total] = await Promise.all([
+      client.project.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            {
+              collaborators: {
+                some: {
+                  userId: userId,
+                },
               },
             },
+          ],
+        },
+        select: {
+          id: true,
+          title: true,
+          owner: {
+            select: {
+              id: true,
+              email: true,
+              username: true,
+            },
           },
-        ],
-      },
-      include: {
-        owner: true,
-        todos: true,
-        collaborators: true,
-      },
-    });
+          _count: {
+            select: { todos: true, collaborators: true },
+          },
+        },
+        orderBy: { updatedAt: "desc" },
+        skip,
+        take: limitNum,
+      }),
+      // Get total count
+      client.project.count({
+        where: {
+          OR: [
+            { ownerId: userId },
+            {
+              collaborators: {
+                some: {
+                  userId: userId,
+                },
+              },
+            },
+          ],
+        },
+      }),
+    ]);
 
-    return projects;
+    return {
+      data: projects,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+        hasNextPage: pageNum < Math.ceil(total / limitNum),
+        hasPrevPage: pageNum > 1,
+      },
+    };
   }
 
   /**
@@ -102,11 +158,12 @@ export class ProjectService {
         title: data.title || project.title,
         updatedAt: new Date(),
       },
-      include: {
-        owner: true,
-        todos: true,
-        collaborators: true,
-      },
+      select: {
+        id: true,
+        title: true,
+        updatedAt: true,
+        ownerId:true
+      }
     });
 
     return updatedProject;
@@ -149,6 +206,10 @@ export class ProjectService {
       where: {
         projectId,
         userId,
+      },
+      select: {
+        role: true,
+        userId: true,
       },
     });
 

@@ -33,6 +33,7 @@ export class CollaboratorService {
     // Find user by email
     const collaboratorUser = await client.user.findUnique({
       where: { email: data.email },
+      select: { id: true },
     });
 
     if (!collaboratorUser) {
@@ -47,12 +48,16 @@ export class CollaboratorService {
     }
 
     // Check if already a collaborator
-    const existingCollaborator = await client.collaborator.findFirst({
+    const existingCollaborators = await client.collaborator.findMany({
       where: {
         projectId,
         userId: collaboratorUser.id,
       },
+      take: 1,
+      select: { userId: true },
     });
+    const existingCollaborator =
+      existingCollaborators.length > 0 ? existingCollaborators[0] : null;
 
     if (existingCollaborator) {
       throw new ApiError(HttpStatus.CONFLICT, "User is already a collaborator");
@@ -65,9 +70,12 @@ export class CollaboratorService {
         userId: collaboratorUser.id,
         role: data.role,
       },
-      include: {
-        user: true,
-        project: true,
+      select: {
+        projectId: true,
+        userId: true,
+        role: true,
+        user: { select: { id: true, username: true, email: true } },
+        project: { select: { id: true, title: true, ownerId: true } },
       },
     });
 
@@ -83,8 +91,10 @@ export class CollaboratorService {
 
     const collaborators = await client.collaborator.findMany({
       where: { projectId },
-      include: {
-        user: true,
+      select: {
+        role: true,
+        projectId: true,
+        user: { select: { id: true, email: true, username: true } },
       },
     });
 
@@ -118,7 +128,13 @@ export class CollaboratorService {
     }
 
     const collaborator = await client.collaborator.findUnique({
-      where: { id: collaboratorId },
+      where: {
+        userId_projectId: { userId: collaboratorId, projectId: projectId },
+      },
+      select: {
+        userId: true,
+        projectId: true,
+      },
     });
 
     if (!collaborator || collaborator.projectId !== projectId) {
@@ -126,13 +142,17 @@ export class CollaboratorService {
     }
 
     const updatedCollaborator = await client.collaborator.update({
-      where: { id: collaboratorId },
+      where: {
+        userId_projectId: { userId: collaboratorId, projectId: projectId },
+      },
       data: {
         role: newRole,
         updatedAt: new Date(),
       },
-      include: {
-        user: true,
+      select: {
+        role: true,
+        userId: true,
+        projectId: true,
       },
     });
 
@@ -165,7 +185,10 @@ export class CollaboratorService {
     }
 
     const collaborator = await client.collaborator.findUnique({
-      where: { id: collaboratorId },
+      where: {
+        userId_projectId: { userId: collaboratorId, projectId: projectId },
+      },
+      select: { userId: true, projectId: true },
     });
 
     if (!collaborator || collaborator.projectId !== projectId) {
@@ -173,7 +196,9 @@ export class CollaboratorService {
     }
 
     await client.collaborator.delete({
-      where: { id: collaboratorId },
+      where: {
+        userId_projectId: { userId: collaboratorId, projectId: projectId },
+      },
     });
 
     return { message: "Collaborator removed successfully" };
@@ -190,6 +215,11 @@ export class CollaboratorService {
       where: {
         projectId,
         userId,
+      },
+      select: {
+        role: true,
+        projectId: true,
+        userId: true,
       },
     });
 

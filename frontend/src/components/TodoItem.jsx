@@ -3,25 +3,38 @@ import {
   GripVertical,
   Calendar,
   Pencil,
-  MessageSquare,
   MoreHorizontal,
   Check,
+  Trash2,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { toggleTodo } from "../features/todo/todoSlice";
+import { completeTodo, deleteTodo } from "../features/todo/todoSlice";
 
 // The TodoItem component receives task data as props.
 function TodoItem({ todo, projectId }) {
   const dispatch = useDispatch();
 
-  function todoCompleteHandler(id) {
-    // Determine projectId: prop > todo.project (if populated object) > todo.projectId
-    const pId = projectId || (typeof todo.project === 'object' ? todo.project._id : todo.project) || todo.projectId;
-    if (!pId) {
-      console.error("No projectId found for todo", todo);
-      return;
+  async function todoEditHandler() {
+    console.log("Todo edit handler will be implemented in future versions");
+  }
+
+  async function todoDeleteHandler(id) {
+    try {
+      await dispatch(deleteTodo({todoId:id}))
+    } catch (error) {
+      
     }
-    dispatch(toggleTodo({ projectId: pId, todoId: id }));
+  }
+
+  async function todoCompleteHandler(id) {
+    // Determine projectId: prop > todo.project (if populated object) > todo.projectId
+    try {
+      await dispatch(completeTodo({ todoId: id }));
+    } catch (error) {}
+  }
+
+  async function changeDeadlineHandler() {
+    console.log("Change deadline handler will be implemented in future versions");
   }
 
   return (
@@ -33,7 +46,7 @@ function TodoItem({ todo, projectId }) {
         {/* Custom Checkbox */}
         <div className="flex-shrink-0 mt-1 mr-3 cursor-pointer">
           <div
-            onClick={() => todoCompleteHandler(todo._id)}
+            onClick={() => todoCompleteHandler(todo.id)}
             className="cursor-pointer relative flex items-center justify-center h-5 w-5 rounded-full border-2 border-orange-400 hover:bg-orange-100"
           >
             {/* The drag handle icon is hidden by default and appears on hover over the parent `group` */}
@@ -49,7 +62,7 @@ function TodoItem({ todo, projectId }) {
           <div className="flex items-center mt-2">
             <Calendar className="w-4 h-4 text-purple-600" />
             <span className="ml-2 text-sm font-semibold text-purple-600">
-              {todo.time}
+              {todo.deadline}
             </span>
           </div>
         </div>
@@ -58,9 +71,18 @@ function TodoItem({ todo, projectId }) {
       {/* Right side: Action Icons */}
       {/* These icons are hidden by default and fade in when the user hovers over the main container (`group`). */}
       <div className="flex items-center space-x-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Pencil className="w-5 h-5 cursor-pointer hover:text-gray-700" />
-        <Calendar className="w-5 h-5 cursor-pointer hover:text-gray-700" />
-        <MessageSquare className="w-5 h-5 cursor-pointer hover:text-gray-700" />
+        <Pencil
+          className="w-5 h-5 cursor-pointer hover:text-gray-700"
+          onClick={todoEditHandler}
+        />
+        <Calendar
+          className="w-5 h-5 cursor-pointer hover:text-gray-700"
+          onClick={changeDeadlineHandler}
+        />
+        <Trash2
+          className="w-5 h-5 cursor-pointer hover:text-gray-700"
+          onClick={() => todoDeleteHandler(todo.id)}
+        />
         <MoreHorizontal className="w-5 h-5 cursor-pointer hover:text-gray-700" />
       </div>
     </div>

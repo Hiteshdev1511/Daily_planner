@@ -3,7 +3,7 @@ import Logo from "../../components/Logo";
 import { Eye } from "lucide-react";
 import { useIsUsernameUnique } from "../../hooks/useIsUsernameUnique";
 import { useNavigate } from "react-router-dom";
-import { authAPI } from "../../services/apiEndpoints";
+import { useRegisterMutation } from "../../features/auth/authApiSlice";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../features/user/userSlice";
 import { useForm } from "react-hook-form";
@@ -27,7 +27,7 @@ function Signup() {
     },
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registerUser, { isLoading: isSubmitting }] = useRegisterMutation();
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
@@ -36,13 +36,12 @@ function Signup() {
 
   async function formSubmitHandler(data) {
     try {
-      setIsSubmitting(true);
       setError(null);
 
       const { email, username, firstname, lastname, dob, gender, password } =
         data;
 
-      const response = await authAPI.register({
+      const response = await registerUser({
         email,
         username,
         firstname,
@@ -50,20 +49,18 @@ function Signup() {
         dob,
         gender,
         password,
-      });
-      const user = response.data.data;
+      }).unwrap();
+      const user = response.data.user;
 
-      // Tokens are now handled via httpOnly cookies
-      dispatch(setUser(user));
-
+      // Tokens handled via httpOnly cookies
+      // dispatch(setUser(user)); 
+      
       navigate("/");
     } catch (err) {
       const errorMessage =
-        err.response?.data?.message || "Signup failed. Please try again.";
+        err.data?.message || "Signup failed. Please try again.";
       setError(errorMessage);
       console.error("Signup error:", err);
-    } finally {
-      setIsSubmitting(false);
     }
   }
 

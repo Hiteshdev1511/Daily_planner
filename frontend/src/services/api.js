@@ -35,11 +35,20 @@ api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const originalRequest = error.config;
+    const isAuthEndpoint =
+      originalRequest.url.includes("/auth/login") ||
+      originalRequest.url.includes("/auth/signup") ||
+      originalRequest.url.includes("/auth/forgot-password") ||
+      originalRequest.url.includes("/auth/reset-password") ||
+      originalRequest.url.includes("/auth/verify-email") ||
+      originalRequest.url.includes("/auth/change-password") ||
+      originalRequest.url.includes("/auth/check-username");
 
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/auth/refresh")
+      !originalRequest.url.includes("/auth/refresh-token") &&
+      !isAuthEndpoint
     ) {
       originalRequest._retry = true;
 
@@ -56,12 +65,14 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await api.post("/auth/refresh");
+        await api.post("/auth/refresh-token");
         processQueue();
         return api(originalRequest);
-      } catch (error) {
-        processQueue(error);
-        return Promise.reject(error);
+      } catch (refreshError) {
+        processQueue(refreshError);
+        // Store a flag to indicate auth failure for UI to handle
+        window.__authFailure = true;
+        return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }

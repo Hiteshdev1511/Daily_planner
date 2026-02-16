@@ -25,10 +25,6 @@ const format = () => {
 const morganMiddleware = morgan(format(), {
   stream,
   skip: (req) => {
-    // Skip healthcheck endpoint logging to reduce noise
-    if (req.path === "/api/v1/healthcheck") {
-      return true;
-    }
     return false;
   },
 });

@@ -1,19 +1,17 @@
 import { z } from "zod";
 
 export const CollaboratorDbSchema = z.object({
-    userId: z.string().uuid("Invalid user id"),
-    email: z.email("Invalid email"),
-    role: z.enum(["OWNER", "ADMIN", "EDITOR", "VIEWER"])
-})
-
-export const AddCollaboratorSchema = z.object({
+  userId: z.string().uuid("Invalid user id"),
   email: z.email("Invalid email"),
-  role: z.enum(["ADMIN", "EDITOR", "VIEWER"]),
+  role: z.enum(["OWNER", "ADMIN", "EDITOR", "VIEWER"]),
 });
 
-export const UpdateRoleSchema = z.object({
-  role: z.enum(["ADMIN", "EDITOR", "VIEWER", "OWNER"]),
+export const AddCollaboratorSchema = CollaboratorDbSchema.pick({
+  email: true,
+  role: true,
 });
+
+export const UpdateRoleSchema = CollaboratorDbSchema.pick({ role: true });
 
 export function validateAddCollaborator(data: unknown) {
   return AddCollaboratorSchema.parse(data);

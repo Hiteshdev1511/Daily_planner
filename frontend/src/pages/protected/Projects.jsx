@@ -1,50 +1,64 @@
-// src/pages/ProjectsPage.jsx
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronDown, Hash } from "lucide-react";
-import { fetchProjects, createProject } from "../../features/project/projectSlice";
+import {
+  fetchProjects,
+  createProject,
+} from "../../features/project/projectSlice";
 
 function ProjectsPage() {
   // Redux state
-  const { projects: apiProjects, status, error: reduxError } = useSelector((state) => state.project);
+  const {
+    projects,
+    status,
+    error: reduxError,
+  } = useSelector((state) => state.project);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // Local state
   const [searchTerm, setSearchTerm] = useState("");
   const [showArchived, setShowArchived] = useState(false);
   const [showAddProject, setShowAddProject] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
-  
+
   // Derived state
   const isLoading = status === "loading";
   const error = reduxError;
 
   // Fetch projects from API on mount
   useEffect(() => {
-    if (status === 'idle') {
+    if (status === "idle") {
       dispatch(fetchProjects());
     }
   }, [status, dispatch]);
 
-  const filteredProjects = apiProjects.filter((project) =>
-    project.title.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  // Filter projects based on search term using useMemo
+  const filteredProjects = useMemo(() => {
+    if (!projects || projects.length === 0) return [];
 
-  async function submitProjectHandler() {
-    if (!newProjectName || newProjectName.trim() === "") return;
-    
-    // Dispatch createProject thunk
+    const trimmedSearch = searchTerm.trim().toLowerCase();
+    if (trimmedSearch.length === 0) return projects;
+
+    return projects.filter((project) =>
+      project?.title?.toLowerCase().includes(trimmedSearch),
+    );
+  }, [projects, searchTerm]);
+
+  const handleCreateProject = async () => {
+    const projectName = newProjectName.trim();
+    if (!projectName) return;
+
     try {
-      await dispatch(createProject({ title: newProjectName })).unwrap();
+      await dispatch(createProject({ title: projectName })).unwrap();
       setNewProjectName("");
       setShowAddProject(false);
     } catch (err) {
       console.error("Failed to create project:", err);
       // Error is handled by Redux state
     }
-  }
+  };
 
   return (
     <div className="flex-1 p-8 bg-white">
@@ -115,8 +129,8 @@ function ProjectsPage() {
                   className="outline-none mb-2 px-2 py-1 border border-gray-300 rounded disabled:opacity-50"
                 />
                 <button
-                  onClick={submitProjectHandler}
-                  disabled={isLoading}
+                  onClick={handleCreateProject}
+                  disabled={isLoading || !newProjectName.trim()}
                   className="bg-blue-500 px-3 py-1 text-white rounded active:bg-blue-600 disabled:opacity-50"
                 >
                   {isLoading ? "Creating..." : "Submit"}
@@ -135,7 +149,7 @@ function ProjectsPage() {
         <hr />
 
         {/* Loading State */}
-        {isLoading && apiProjects.length === 0 && (
+        {isLoading && projects.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-600">Loading projects...</p>
           </div>
@@ -147,33 +161,34 @@ function ProjectsPage() {
             <h2 className="text-sm font-bold text-gray-700">
               {filteredProjects.length} projects
             </h2>
-            {filteredProjects.length === 0 && apiProjects.length === 0 && (
+            {filteredProjects.length === 0 && projects.length === 0 && (
               <p className="text-gray-600 mt-4">
                 No projects yet. Create one to get started!
               </p>
             )}
-            {filteredProjects.length === 0 && apiProjects.length > 0 && (
+            {filteredProjects.length === 0 && projects.length > 0 && (
               <p className="text-gray-600 mt-4">
                 No projects match your search.
               </p>
             )}
             <ul className="mt-4 space-y-1">
-              {filteredProjects.map((project) => (
-                <li
-                  key={project.id}
-                  onClick={() =>
-                    navigate(`/app/projects/${project.id}`, {
-                      state: { project },
-                    })
-                  }
-                  className="flex items-center p-2 rounded-md hover:bg-gray-100 cursor-pointer"
-                >
-                  <Hash className="w-5 h-5 text-gray-500" />
-                  <span className="ml-3 text-sm text-gray-800">
-                    {project.title}
-                  </span>
-                </li>
-              ))}
+              {filteredProjects.length > 0 &&
+                filteredProjects.map((project) => (
+                  <li
+                    key={project.id}
+                    onClick={() =>
+                      navigate(`/app/projects/${project.title}`, {
+                        state: { project },
+                      })
+                    }
+                    className="flex items-center p-2 rounded-md hover:bg-gray-100 cursor-pointer"
+                  >
+                    <Hash className="w-5 h-5 text-gray-500" />
+                    <span className="ml-3 text-sm text-gray-800">
+                      {project.title}
+                    </span>
+                  </li>
+                ))}
             </ul>
           </div>
         )}

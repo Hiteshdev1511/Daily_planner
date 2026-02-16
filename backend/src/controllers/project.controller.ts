@@ -46,7 +46,14 @@ export const getUserProjects = asyncHandler(
       throw new ApiError(HttpStatus.UNAUTHORIZED, "User not authenticated");
     }
 
-    const result = await ProjectService.getUserProjects(req.user.id);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const result = await ProjectService.getUserProjects(
+      req.user.id,
+      page,
+      limit,
+    );
 
     res
       .status(HttpStatus.OK)

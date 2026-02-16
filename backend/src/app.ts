@@ -4,7 +4,6 @@ import { EnvVariables } from "./types/common";
 import cookieParser from "cookie-parser";
 import errorHandler from "./utils/errorMiddleware";
 import { morganMiddleware } from "./lib/morgan";
-import { logger } from "./lib/logger";
 
 const app: Application = express();
 
@@ -18,8 +17,18 @@ const corsOptions = {
 
 // Middleware setup
 app.use(cors(corsOptions));
-app.use(logger.stream); // Optional logging middleware
 app.use(morganMiddleware); // HTTP request logging
+
+// Performance monitoring middleware
+app.use((req, res, next) => {
+  const start = performance.now();
+  res.on("finish", () => {
+    const duration = performance.now() - start;
+    console.log(`${req.method} ${req.originalUrl} - ${duration.toFixed(2)}ms`);
+  });
+  next();
+});
+
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
@@ -39,7 +48,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/collaborator", collaboratorRouter);
 app.use("/api/v1/projects", projectRouter);
-app.use("/api/v1/todo", todoRouter);
+app.use("/api/v1/todos", todoRouter);
 
 app.use(errorHandler);
 

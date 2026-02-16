@@ -8,60 +8,64 @@ const initialState = {
 };
 
 // Async Thunks
-export const fetchTodos = createAsyncThunk(
+export const fetchAllTodos = createAsyncThunk(
   "todo/fetchTodos",
-  async (projectId, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await todoAPI.getTodos(projectId);
-      return response.data;
+      const response = await todoAPI.getTodos();
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch todos"
+        error.response?.data?.message || "Failed to fetch todos",
       );
     }
-  }
+  },
 );
 
-export const addTodo = createAsyncThunk(
+export const createTodo = createAsyncThunk(
   "todo/addTodo",
   async ({ projectId, data }, { rejectWithValue }) => {
     try {
       const response = await todoAPI.createTodo(projectId, data);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to add todo"
+        error.response?.data?.message || "Failed to add todo",
       );
     }
-  }
+  },
 );
 
-export const toggleTodo = createAsyncThunk(
+export const editTodo = createAsyncThunk();
+
+export const completeTodo = createAsyncThunk(
   "todo/toggleTodo",
-  async ({ projectId, todoId }, { rejectWithValue }) => {
+  async ({ todoId }, { rejectWithValue }) => {
     try {
-      const response = await todoAPI.toggleTodo(projectId, todoId);
-      return response.data; // Should return updated todo or success message
+      const response = await todoAPI.completeTodo(todoId);
+      return response.data.data; // Should return updated todo or success message
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to toggle todo"
+        error.response?.data?.message || "Failed to toggle todo",
       );
     }
-  }
+  },
 );
+
+export const changeDeadline = createAsyncThunk();
 
 export const deleteTodo = createAsyncThunk(
   "todo/deleteTodo",
-  async ({ projectId, todoId }, { rejectWithValue }) => {
+  async ({ todoId }, { rejectWithValue }) => {
     try {
-      await todoAPI.deleteTodo(projectId, todoId);
+      await todoAPI.deleteTodo(todoId);
       return todoId; // Return ID to remove from state locally
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to delete todo"
+        error.response?.data?.message || "Failed to delete todo",
       );
     }
-  }
+  },
 );
 
 export const todoSlice = createSlice({
@@ -71,27 +75,26 @@ export const todoSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // fetchTodos
-      .addCase(fetchTodos.pending, (state) => {
+      .addCase(fetchAllTodos.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(fetchTodos.fulfilled, (state, action) => {
+      .addCase(fetchAllTodos.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.todos = action.payload;
       })
-      .addCase(fetchTodos.rejected, (state, action) => {
+      .addCase(fetchAllTodos.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       })
       // addTodo
-      .addCase(addTodo.fulfilled, (state, action) => {
+      .addCase(createTodo.fulfilled, (state, action) => {
         state.todos.push(action.payload);
       })
       // toggleTodo
-      .addCase(toggleTodo.fulfilled, (state, action) => {
-        // Assuming action.payload is the updated todo or we need to find and toggle locally
-        // Optimistic update might be better, but let's assume implementation returns updated obj
+      .addCase(completeTodo.fulfilled, (state, action) => {
         const index = state.todos.findIndex(
-          (todo) => todo._id === action.payload._id // Assuming _id from Mongoose
+          (todo) =>
+            todo.id === action.payload.id || todo.id === action.payload._id,
         );
         if (index !== -1) {
           state.todos[index] = action.payload;
@@ -99,7 +102,7 @@ export const todoSlice = createSlice({
       })
       // deleteTodo
       .addCase(deleteTodo.fulfilled, (state, action) => {
-        state.todos = state.todos.filter((todo) => todo._id !== action.payload);
+        state.todos = state.todos.filter((todo) => todo.id !== action.payload);
       });
   },
 });

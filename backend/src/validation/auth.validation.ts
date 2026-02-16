@@ -9,53 +9,48 @@ const passwordSchema = z
     "Password must follow character constraints",
   );
 
-export const RegisterSchema = z
-  .object({
-    email: z.email("Invalid email format"),
-    password: passwordSchema,
-    username: z
-      .string()
-      .regex(/^[a-z]+$/)
-      .trim()
-      .min(1),
-    firstname: z.string().min(1, "First name is required"),
-    lastname: z.string().optional(),
-    dob: z.coerce.date(),
-    gender: z.string(),
-  });
+export const AuthDbSchema = z.object({
+  email: z.email("Invalid email format"),
+  password: passwordSchema,
+  username: z
+    .string()
+    .regex(/^[A-Za-z0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\-]+$/)
+    .trim()
+    .min(1),
+  firstname: z.string().min(1, "First name is required"),
+  lastname: z.string().optional(),
+  dob: z.iso.date(),
+  gender: z.string(),
+  resetToken: z.string().nonempty(),
+});
 
-export const LoginSchema = z
-  .object({
+export const RegisterSchema = AuthDbSchema.omit({ resetToken: true });
+
+export const LoginSchema = z.object({
     email: z.email("Invalid email format").optional(),
     username: z
       .string()
-      .regex(/^[a-z]+$/)
+      .regex(/^[A-Za-z0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\-]+$/)
       .trim()
       .min(1)
       .optional(),
     password: passwordSchema,
-  })
-  .refine((data) => data.email || data.username, {
+  }).refine((data) => data.email || data.username, {
     message: "Either email or username is required",
     path: ["email"],
   });
 
-export const ChangePasswordSchema = z
-  .object({
-    currentPassword: passwordSchema,
-    newPassword: passwordSchema,
-  });
+export const ChangePasswordSchema = z.object({
+  currentPassword: passwordSchema,
+  newPassword: passwordSchema,
+});
 
-export const ForgotPasswordSchema = z
-  .object({
-    email: z.email("Invalid email format"),
-  });
+export const ForgotPasswordSchema = AuthDbSchema.pick({ email: true });
 
-export const ResetPasswordSchema = z
-  .object({
-    resetToken: z.string().nonempty(),
-    password:passwordSchema
-  });
+export const ResetPasswordSchema = AuthDbSchema.pick({
+  password: true,
+  resetToken: true,
+});
 
 export function validateRegister(data: unknown) {
   return RegisterSchema.parse(data);

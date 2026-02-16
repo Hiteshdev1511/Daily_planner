@@ -9,8 +9,9 @@ export default function ProtectedRoute() {
     return <div className="text-center mt-20">Loading...</div>;
   }
 
-  if (!user) {
-    return <Navigate to="/auth/login" state={{from:location}} replace/>
+  // Redirect to login if auth failed (token refresh failed) or user doesn't exist
+  if (!user || status === "failed") {
+    return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
   return <Outlet />;

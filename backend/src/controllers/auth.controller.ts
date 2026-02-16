@@ -11,18 +11,24 @@ import {
   validateForgotPassword,
   validateResetPassword,
 } from "../validation/auth.validation";
+import { logger } from "../lib/logger";
 
 export const registerUser = asyncHandler(
   async (req: Request, res: Response) => {
     const validatedData = validateRegister(req.body);
 
     const result = await AuthService.register({
-      ...validatedData
+      ...validatedData,
     });
 
     res
       .status(HttpStatus.CREATED)
       .cookie("accessToken", result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      })
+      .cookie("refreshToken", result.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
@@ -49,6 +55,11 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     })
+    .cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    })
     .json(new ApiResponse(HttpStatus.OK, "Login successful", result));
 });
 
@@ -62,6 +73,7 @@ export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   res
     .status(HttpStatus.OK)
     .clearCookie("accessToken")
+    .clearCookie("refreshToken")
     .json(new ApiResponse(HttpStatus.OK, "Logout successful", result));
 });
 
@@ -85,7 +97,7 @@ export const changePassword = asyncHandler(
 
 export const forgotPassword = asyncHandler(
   async (req: Request, res: Response) => {
-    const {email} = validateForgotPassword(req.body)
+    const { email } = validateForgotPassword(req.body);
 
     const result = await AuthService.forgotPassword(email);
 
@@ -103,7 +115,9 @@ export const forgotPassword = asyncHandler(
 
 export const resetPassword = asyncHandler(
   async (req: Request, res: Response) => {
-    const { resetToken:token, password:newPassword } = validateResetPassword(req.body)
+    const { resetToken: token, password: newPassword } = validateResetPassword(
+      req.body,
+    );
 
     const result = await AuthService.resetPassword(token, newPassword);
 
@@ -136,7 +150,6 @@ export const refreshAccessToken = asyncHandler(
 export const checkUsernameUnique = asyncHandler(
   async (req: Request, res: Response) => {
     const { username } = req.query;
-
     if (!username) {
       throw new ApiError(HttpStatus.BAD_REQUEST, "Username is required");
     }

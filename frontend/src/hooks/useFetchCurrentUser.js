@@ -1,14 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCurrentUser } from "../features/user/userSlice";
 
 export const useFetchCurrentUser = () => {
-  const { user, status } = useSelector((state) => state.user);
+  const { status } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const hasBeenCalled = useRef(false);
 
   useEffect(() => {
-    if (status === "idle" && !user) {
+    if (!hasBeenCalled.current && status === "idle") {
+      hasBeenCalled.current = true;
       dispatch(fetchCurrentUser());
     }
-  }, [dispatch, user, status]);
+  }, [dispatch, status]);
 };

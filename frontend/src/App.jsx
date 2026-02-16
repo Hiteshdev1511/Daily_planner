@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useFetchCurrentUser } from "./hooks/useFetchCurrentUser";
+import { useGetCurrentUserQuery } from "./features/auth/authApiSlice";
 
 // eslint-disable-next-line react/prop-types
 export default function App({ children }) {
   const { theme } = useSelector((state) => state.theme);
 
-  useFetchCurrentUser();
+  useGetCurrentUserQuery();
 
   useEffect(() => {
     if (theme === "dark") {
