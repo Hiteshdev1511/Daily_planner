@@ -1,6 +1,7 @@
 import { ErrorRequestHandler } from "express";
 import { HttpStatus } from "../types/api";
 import { ApiError } from "./ApiError";
+import { logger } from "../lib/logger";
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let error: ApiError;
@@ -15,6 +16,17 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
       false,
     );
   }
+
+  // Log the error
+  logger.error("Request error", {
+    statusCode: error.statusCode,
+    message: error.message,
+    path: req.path,
+    method: req.method,
+    ip: req.ip,
+    errors: error.errors,
+    stack: error.stack,
+  });
 
   const response = {
     success: false,

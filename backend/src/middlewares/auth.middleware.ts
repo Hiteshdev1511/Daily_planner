@@ -31,6 +31,10 @@ export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
     // Attach user to request
     req.user = { id: payload.userId, userId: payload.userId };
 
+    if (!req.user) {
+      throw new ApiError(HttpStatus.UNAUTHORIZED, "User not authenticated");
+    }
+
     next();
   } catch (error) {
     if (error instanceof ApiError) {

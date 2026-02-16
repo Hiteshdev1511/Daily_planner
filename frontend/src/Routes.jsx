@@ -12,6 +12,7 @@ import {
   Home,
   Login,
   Signup,
+  UpdateProfile,
   Todos,
   Inbox,
   Today,
@@ -20,47 +21,43 @@ import {
   Projects,
   Project,
   VerifyEmail,
-  ForgetPassword,
+  ChangePassword,
   ForgotPassword,
   ResetPassword,
+  About,
+  Contact,
 } from "./pages/index.js";
-import { useSelector } from "react-redux";
-
-// Protected Route component
-const ProtectedRoute = ({ children }) => {
-  const { user, status } = useSelector((state) => state.user);
-  if(status==="loading") return null
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-};
+import AuthLayout from "./components/Layout/AuthLayout.jsx";
+import RootLayout from "./components/Layout/RootLayout.jsx";
+import ProtectedRoute from "./ProtectedRoute.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
-    <Route path="" element={<Home />} errorElement={<ErrorPage />} />,
-    <Route
-      path="app"
-      element={
-        <ProtectedRoute>
-          <Todos />
-        </ProtectedRoute>
-      }
-    >
-      <Route index element={<Navigate to="inbox" replace />} />
-      <Route path="inbox" element={<Inbox />} />
-      <Route path="today" element={<Today />} />
-      <Route path="upcoming" element={<Upcoming />} />
-      <Route path="completed" element={<Completed />} />
-      <Route path="projects" element={<Projects />} />
-      <Route path="projects/:projectName" element={<Project />} />
+    <Route element={<RootLayout />} errorElement={<ErrorPage />}>
+      <Route index element={<Home />} />,
+      <Route path="about" element={<About />} />,
+      <Route path="contact" element={<Contact />} />,
     </Route>,
-    <Route path="login" element={<Login />} />,
-    <Route path="signup" element={<Signup />} />,
-    <Route path="verify-email" element={<VerifyEmail />} />,
-    <Route path="forget-password" element={<ForgetPassword />} />,
-    <Route path="forgot-password" element={<ForgotPassword />} />,
-    <Route path="reset-password" element={<ResetPassword />} />,
+    <Route element={<ProtectedRoute />}>
+      <Route path="update-profile" element={<UpdateProfile/>}/>
+      <Route path="app" element={<Todos />}>
+        <Route index element={<Navigate to="inbox" replace />} />,
+        <Route path="inbox" element={<Inbox />} />
+        <Route path="today" element={<Today />} />
+        <Route path="upcoming" element={<Upcoming />} />
+        <Route path="completed" element={<Completed />} />
+        <Route path="projects" element={<Projects />} />
+        <Route path="projects/:projectName" element={<Project />} />
+      </Route>
+    </Route>,
+    <Route path="auth" element={<AuthLayout />}>
+      <Route path="login" element={<Login />} />,
+      <Route path="signup" element={<Signup />} />,
+      <Route path="verify-email" element={<VerifyEmail />} />,
+      <Route path="forgot-password" element={<ForgotPassword />} />,
+      <Route path="reset-password" element={<ResetPassword />} />,
+      <Route path="change-password" element={<ChangePassword />} />
+    </Route>,
     <Route path="*" element={<ErrorPage />} />,
   ]),
 );

@@ -1,12 +1,9 @@
-import {
-  PanelRight,
-  SquareMenu,
-  MessageSquare,
-  Ellipsis,
-} from "lucide-react";
-import { useState } from "react";
+import { PanelRight, SquareMenu, MessageSquare, Ellipsis } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
+import { useDispatch } from "react-redux";
+import { fetchAllTodos } from "../../features/todo/todoSlice";
 
 function Navbar() {
   return (
@@ -45,6 +42,14 @@ function Navbar() {
 function Todos() {
   // State to control the sidebar's visibility. Set to `true` to start open.
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const loadData = async () => {
+      await dispatch(fetchAllTodos());
+    };
+    loadData();
+  }, [dispatch]);
 
   return (
     <div className="relative min-h-screen bg-gray-50">

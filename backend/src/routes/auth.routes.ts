@@ -19,7 +19,7 @@ router.route("/logout").post(checkAuth, logoutUser);
 router.route("/change-password").post(checkAuth, changePassword);
 router.route("/forgot-password").post(forgotPassword);
 router.route("/reset-password").post(resetPassword);
-router.route("/refresh-token").post(checkAuth, refreshAccessToken);
+router.route("/refresh-token").post(refreshAccessToken);
 router.route("/check-username").get(checkUsernameUnique);
 
 export default router

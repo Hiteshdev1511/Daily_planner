@@ -13,13 +13,13 @@ export const fetchProjects = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await projectAPI.getProjects();
-      return response.data; // Assuming data is the array
+      return response.data.data; // Assuming data is the array
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch projects"
+        error.response?.data?.message || "Failed to fetch projects",
       );
     }
-  }
+  },
 );
 
 export const createProject = createAsyncThunk(
@@ -27,14 +27,16 @@ export const createProject = createAsyncThunk(
   async (projectData, { rejectWithValue }) => {
     try {
       const response = await projectAPI.createProject(projectData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to create project"
+        error.response?.data?.message || "Failed to create project",
       );
     }
-  }
+  },
 );
+
+export const deleteProject = createAsyncThunk();
 
 export const projectSlice = createSlice({
   name: "project",
@@ -48,7 +50,7 @@ export const projectSlice = createSlice({
       })
       .addCase(fetchProjects.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.projects = action.payload; // Adjust based on actual API response structure
+        state.projects = action.payload; // Store the projects array directly
       })
       .addCase(fetchProjects.rejected, (state, action) => {
         state.status = "failed";

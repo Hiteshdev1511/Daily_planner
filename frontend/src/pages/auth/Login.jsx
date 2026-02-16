@@ -2,24 +2,23 @@
 import { useState } from "react";
 import Logo from "../../components/Logo";
 import { Eye } from "lucide-react";
-import verifyInput from "../../utils/verifyInput";
 import { useNavigate } from "react-router-dom";
-import { authAPI } from "../../services/apiEndpoints";
+import { useLoginMutation } from "../../features/auth/authApiSlice";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../features/user/userSlice";
+import { useForm } from "react-hook-form";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [input, setInput] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, touchedFields },
+  } = useForm({ defaultValues: { input: "", password: "" } });
+  const [inputType, setInputType] = useState("username");
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [login, { isLoading: isSubmitting }] = useLoginMutation();
   const [error, setError] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
-
-  const isInputInvalid = submitted && !input;
-  const isPasswordInvalid = submitted && !password;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -28,43 +27,41 @@ function Login() {
     const result = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
       input,
     );
+
     if (result) {
-      setEmail(input);
+      setInputType("email");
     } else {
-      setUsername(input);
+      setInputType("text");
     }
   }
 
-  async function formSubmitHandler() {
-    setSubmitted(true);
-    if (!input || !password) {
-      return;
-    }
-
+  async function formSubmitHandler(data) {
     try {
-      setIsSubmitting(true);
       setError(null);
 
       const loginData = {
-        ...(email ? { email } : {}),
-        ...(username ? { username } : {}),
-        password,
+        ...(inputType==="email" ? { email:data.input } : {username:data.input}),
+        password:data.password,
       };
 
-      const response = await authAPI.login(loginData);
-      const { data } = response.data;
+      const response = await login(loginData).unwrap();
+      const user = response.data.user;
 
       // Tokens are now handled via httpOnly cookies
-      dispatch(setUser(data.user));
-
+      // User is already set in store by onQueryStarted in authApiSlice, 
+      // but if we want to be explicit or if we removed that logic:
+      // dispatch(setUser(user)); 
+      // Actually authApiSlice handles dispatch(setUser), but let's leave it if needed or remove it.
+      // The authApiSlice I wrote does dispatch setUser. So we don't strictly need it here, 
+      // but it doesn't hurt to be safe or just rely on the slice.
+      // Let's rely on the slice logic I wrote or just navigation.
+      
       navigate("/");
     } catch (err) {
       const errorMessage =
-        err.response?.data?.message || "Login failed. Please try again.";
+        err.data?.message || "Login failed. Please try again.";
       setError(errorMessage);
       console.error("Login error:", err);
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
@@ -83,7 +80,11 @@ function Login() {
                   <span className="block sm:inline">{error}</span>
                 </div>
               )}
-              <div className="space-y-4 md:space-y-6">
+              <form
+                className="space-y-4 md:space-y-6"
+                onSubmit={handleSubmit(formSubmitHandler)}
+              >
+                {/* Email or Username */}
                 <div>
                   <label
                     htmlFor="input"
@@ -92,20 +93,22 @@ function Login() {
                     Email or Username
                   </label>
                   <input
-                    onChange={(e) => setInput(e.target.value)}
-                    onBlur={() => checkInputType(input)}
-                    type="text"
-                    value={input}
+                    type={inputType}
                     className={`bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
-                      isInputInvalid ? "border-red-500" : "border-gray-300"
+                      touchedFields.input && errors.input
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
                     placeholder="user@example.com"
-                    required={true}
                     disabled={isSubmitting}
+                    {...register("input", {
+                      required: "Password or Username is required",
+                      validate: (input) => checkInputType(input)
+                    })}
                   />
-                  {isInputInvalid && (
+                  {errors.input && (
                     <p className="mt-1 text-sm text-red-600">
-                      Please enter a valid email/username
+                      {errors.input.message}
                     </p>
                   )}
                 </div>
@@ -119,17 +122,24 @@ function Login() {
                   </label>
                   <div
                     className={`flex items-center justify-between bg-gray-50 border text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 w-full p-2.5 ${
-                      isPasswordInvalid ? "border-red-500" : "border-gray-300"
+                      touchedFields.password && errors.password
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
                   >
                     <input
                       type={showPassword ? "text" : "password"}
-                      onChange={(e) => setPassword(e.target.value)}
-                      value={password}
                       placeholder={showPassword ? "4fjisjg8Phf*%" : "••••••••"}
                       className="focus:outline-none h-full w-full bg-transparent"
-                      required
                       disabled={isSubmitting}
+                      {...register("password", {
+                        required: "Password is required",
+                        pattern: {
+                          value: /^[^ \t]+$/,
+                          message: "Password cannot contain whitespaces",
+                        },
+                        minLength: 8,
+                      })}
                     />
 
                     <Eye
@@ -139,9 +149,9 @@ function Login() {
                       className="cursor-pointer"
                     />
                   </div>
-                  {isPasswordInvalid && (
+                  {errors.password && (
                     <p className="mt-1 text-sm text-red-600">
-                      Password field should not be empty
+                      {errors.password.message}
                     </p>
                   )}
                 </div>
@@ -163,7 +173,7 @@ function Login() {
                   </div>
                   <div className="text-sm">
                     <a
-                      href="/forgot-password"
+                      href="/auth/forgot-password"
                       className="text-blue-600 hover:underline font-semibold"
                     >
                       Forgot your password?
@@ -171,7 +181,7 @@ function Login() {
                   </div>
                 </div>
                 <button
-                  onClick={formSubmitHandler}
+                  type="submit"
                   disabled={isSubmitting}
                   className="w-full text-white bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -266,11 +276,11 @@ function Login() {
                     <span>Continue with Facebook</span>
                   </button>
                 </div>
-              </div>
+              </form>
               <p className="text-sm font-light text-gray-500">
                 Dont have an account{" "}
                 <a
-                  href="/signup"
+                  href="/auth/signup"
                   className="font-medium text-primary-600 hover:underline "
                 >
                   Sign up

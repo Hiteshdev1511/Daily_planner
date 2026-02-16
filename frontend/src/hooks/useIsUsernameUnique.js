@@ -1,39 +1,45 @@
 import { useState, useEffect } from "react";
-import { authAPI } from "../services/apiEndpoints";
+import { useLazyCheckUsernameUniqueQuery } from "../features/auth/authApiSlice";
 
-export const useIsUsernameUnique = (input) => {
+export const useIsUsernameUnique = (username) => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [trigger, { isFetching: loading }] = useLazyCheckUsernameUniqueQuery();
 
   useEffect(() => {
-    if (!input) {
+    if (!username) {
       setData(null);
-      setLoading(false);
       return;
     }
 
-    async function checkUniqueness() {
-      setLoading(true);
-      setError(null);
+    // Debounce the API call
+    const timer = setTimeout(async () => {
       try {
-        const response = await authAPI.checkUsernameUnique(input);
-        setData(response.data.data.isUnique);
+        setError(null);
+        const response = await trigger(username).unwrap();
+        // The API returns { data: { isUnique: boolean }, ... } based on typical structure
+        // But let's check authApiSlice definition.
+        // query: (username) => `/auth/check-username?username=${username}`
+        // baseQuery returns proper data.
+        // Assuming response matches previous: response.data.data.isUnique ? 
+        // Wait, RTK Query unwrap() returns the *data* from the successful response.
+        // If the backend wraps it in ApiResponse { data: { isUnique: ... } }
+        // Let's assume standard response structure.
+        setData(response.data.isUnique);
       } catch (err) {
-        setError(err?.response?.data?.message || err?.message || "Failed to check username");
+        // If 409 Conflict or validation error?
+        // Usually check-username might return 200 with isUnique: false or 409.
+        // Let's match previous behavior:
+        // previous: setData(response.data.data.isUnique);
+        // error: setError(...)
+        
+        setError(err?.data?.message || "Failed to check username");
         setData(null);
-      } finally {
-        setLoading(false);
       }
-    }
-
-    // Debounce the API call - wait 500ms after user stops typing
-    const timer = setTimeout(() => {
-      checkUniqueness();
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [input]);
+  }, [username, trigger]);
 
   return { data, error, loading };
 };

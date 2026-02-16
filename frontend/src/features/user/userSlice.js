@@ -1,12 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authAPI, userAPI } from "../../services/apiEndpoints";
 
-const initialState = {
-  user:null,
-  status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
-  error: null,
-};
-
 // Async Thunks
 export const fetchCurrentUser = createAsyncThunk(
   "user/fetchCurrentUser",
@@ -36,6 +30,12 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
+const initialState = {
+  user:null,
+  status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+  error: null,
+};
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -45,6 +45,11 @@ export const userSlice = createSlice({
       state.status = "succeeded";
     },
     clearUser: (state) => {
+      state.user = null;
+      state.status = "idle";
+      state.error = null;
+    },
+    logout: (state) => {
       state.user = null;
       state.status = "idle";
       state.error = null;
@@ -73,5 +78,5 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, clearUser, logout } = userSlice.actions;
 export default userSlice.reducer;

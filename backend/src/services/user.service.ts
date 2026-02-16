@@ -11,8 +11,6 @@ export class UserService {
       where: { id: userId },
       include: {
         person: true,
-        ownedProjects: true,
-        collaborations: true,
       },
     });
 
@@ -21,12 +19,16 @@ export class UserService {
     }
 
     return {
-      id: user.id,
+      userId: user.id,
       email: user.email,
       username: user.username,
-      person: user.person,
-      ownedProjects: user.ownedProjects,
-      collaborations: user.collaborations,
+      person: {
+        id: user.person.id,
+        firstname: user.person.firstname,
+        lastname: user.person.lastname,
+        gender: user.person.gender,
+        dob: user.person.dob,
+      },
     };
   }
 
@@ -37,7 +39,6 @@ export class UserService {
     const user = await client.user.findUnique({
       where: { id: userId },
       include: {
-        person: true,
         ownedProjects: true,
       },
     });
@@ -46,7 +47,12 @@ export class UserService {
       throw new ApiError(HttpStatus.NOT_FOUND, "User not found");
     }
 
-    return user;
+    return {
+      userId: user.id,
+      email: user.email,
+      username: user.username,
+      ownedProjects: user.ownedProjects,
+    };
   }
 
   /**
@@ -63,6 +69,7 @@ export class UserService {
   ) {
     const user = await client.user.findUnique({
       where: { id: userId },
+      select: { id: true },
     });
 
     if (!user) {
@@ -89,7 +96,16 @@ export class UserService {
       },
     });
 
-    return updatedUser;
+    return {
+      userId: updatedUser.id,
+      username: updatedUser.username,
+      person: {
+        firstname: updatedUser.person.firstname,
+        lastname: updatedUser.person.lastname,
+        dob: updatedUser.person.dob,
+        gender: updatedUser.person.gender,
+      },
+    };
   }
 
   /**

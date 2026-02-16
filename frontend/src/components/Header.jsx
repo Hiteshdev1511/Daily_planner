@@ -3,7 +3,7 @@ import { useState, useRef } from "react"; // Make sure to import useRef
 import Logo from "./Logo";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logoutUser } from "../features/user/userSlice";
+import { useLogoutMutation } from "../features/auth/authApiSlice";
 
 // A reusable dropdown component
 // eslint-disable-next-line react/prop-types
@@ -66,21 +66,27 @@ const NavLink = ({ children, href = "#" }) => (
 function Header() {
   const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  // dispatch is likely used for other things? If not, we can remove it, 
+  // but let's keep it safe or remove if unused. 
+  // Wait, logout mutation handles dispatch internally via onQueryStarted 
+  // effectively updating the store via slice.
+  // But we need to call the mutation function.
+  const [logout] = useLogoutMutation();
 
   function getStartedHandler() {
     if (!user) {
-      navigate("/signup");
+      navigate("/auth/signup");
     } else {
       navigate("/app");
     }
   }
-  function logoutHandler() {
-    dispatch(logoutUser())
-      .unwrap()
-      .then(() => {
-        navigate("/login");
-      });
+  async function logoutHandler() {
+    try {
+      await logout().unwrap();
+      navigate("/auth/login");
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
   }
   return (
     <nav className="flex justify-around bg-white text-black py-2 h-20 items-center shadow-sm sticky top-0 z-10">
@@ -136,7 +142,7 @@ function Header() {
             Logout
           </button>
         ) : (
-          <NavLink href="/login">Login</NavLink>
+          <NavLink href="/auth/login">Login</NavLink>
         )}
 
         <div className="ml-4 h-10 px-5 text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center font-semibold rounded-lg">

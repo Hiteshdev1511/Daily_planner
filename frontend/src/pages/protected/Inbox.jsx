@@ -24,30 +24,42 @@ function Inbox() {
   const [isAddTaskInputOpen, setIsAddTaskInputOpen] = useState(false);
   const [todoList, setTodoList] = useState([]);
 
-  const { todos } = useSelector((state) => state.todo);
+  const { todos, status } = useSelector((state) => state.todo);
+  const isLoading = status === "loading";
 
   useEffect(() => {
-    setTodoList(todos.filter((todo)=>todo.isCompleted === false));
+    setTodoList(todos.filter((todo) => todo.isCompleted === false));
   }, [todos]);
 
   return (
     <div className="flex flex-col justify-center items-center h-11/12">
       <div className="w-1/2">
         <h1 className="text-3xl font-bold flex justify-start">Inbox</h1>
+
+        {/* Loading state */}
+        {isLoading && <p className="text-gray-500 mt-4">Loading todos...</p>}
+
+        {/* Empty state */}
+        {!isLoading && todoList.length === 0 && (
+          <p className="text-gray-500 mt-4">No tasks in your inbox</p>
+        )}
+
         {/* Main todos list */}
         <div>
-          {todoList.map((todo, index) => (
-            <TodoItem
-              key={index}
-              todo = {todo}
-            />
+          {todoList.map((todo) => (
+            <TodoItem key={todo.id} todo={todo} />
           ))}
         </div>
+
         {/* Add task */}
-        {isAddTaskInputOpen ? (
-          <InputTodo onCancel={() => setIsAddTaskInputOpen(false)}/>
-        ) : (
-          <Addtask func={setIsAddTaskInputOpen} />
+        {!isLoading && (
+          <>
+            {isAddTaskInputOpen ? (
+              <InputTodo onCancel={() => setIsAddTaskInputOpen(false)} />
+            ) : (
+              <Addtask func={setIsAddTaskInputOpen} />
+            )}
+          </>
         )}
 
         {/* Add section line */}

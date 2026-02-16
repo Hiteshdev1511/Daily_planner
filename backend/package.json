@@ -4,10 +4,11 @@
   "description": "Todo application backend API",
   "main": "dist/server.js",
   "scripts": {
-  "prebuild": "prisma generate",
-  "build": "tsc",
-  "start": "node dist/server.js"
-},
+    "prebuild": "prisma generate",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev":"tsx watch src/server.ts"
+  },
   "keywords": [
     "todo",
     "api",
@@ -38,14 +39,17 @@
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@prisma/extension-accelerate": "^3.0.1",
+    "@types/morgan": "^1.9.10",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
     "nodemailer": "^8.0.0",
     "pg": "^8.17.2",
+    "winston": "^3.19.0",
     "zod": "^4.3.6"
   }
 }

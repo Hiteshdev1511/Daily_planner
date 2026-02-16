@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+   output   = "../generated/prisma"
 }
 
 datasource db {
@@ -33,6 +34,7 @@ model User {
   refreshToken        String?
   passwordResetToken  String?
   passwordResetExpiry DateTime?
+  isUserVerified      Boolean @default(false)
   createdAt           DateTime @default(now())
   updatedAt           DateTime? 
 
@@ -42,6 +44,11 @@ model User {
   todos          Todo[]
   collaborations Collaborator[]
   ownedProjects  Project[] @relation("ProjectOwner")
+
+  // Add indexes for frequently queried columns
+  @@index([email])
+  @@index([username])
+  @@index([personId])
 }
 
 model Project {
@@ -55,10 +62,12 @@ model Project {
 
   todos         Todo[]
   collaborators Collaborator[]
+
+  // Add indexes for frequently queried columns
+  @@index([ownerId])
 }
 
 model Collaborator {
-  id        String   @id @default(uuid())
   role      Role @default(VIEWER)
   createdAt DateTime @default(now())
   updatedAt DateTime? 
@@ -68,7 +77,10 @@ model Collaborator {
   project   Project @relation(fields: [projectId], references: [id])
   projectId String
 
-  @@unique([userId, projectId])
+  @@id([userId,projectId])
+  // Add separate indexes for individual foreign keys
+  @@index([userId])
+  @@index([projectId])
 }
 
 model Todo {
@@ -84,4 +96,11 @@ model Todo {
 
   creator   User   @relation(fields: [createdBy], references: [id])
   createdBy String
+
+  // Add indexes for frequently queried columns
+  @@index([projectId])
+  @@index([createdBy])
+  @@index([isCompleted])
+  @@index([deadline])
+  @@index([projectId, isCompleted]) // Composite index for common filtering
 }

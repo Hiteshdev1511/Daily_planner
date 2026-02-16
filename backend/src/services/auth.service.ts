@@ -12,6 +12,7 @@ import type {
   ChangePasswordRequest,
 } from "../types/request/Auth.requests";
 import type { AuthTokens, JWTPayload } from "../types/auth";
+import { logger } from "../lib/logger";
 
 const SALT_ROUNDS = 10;
 
@@ -20,10 +21,11 @@ export class AuthService {
     data: RegisterRequest & {
       firstname: string;
       lastname?: string;
-      dob: Date;
+      dob: string;
       gender: string;
     },
   ) {
+    logger.info(data.username);
     // Check if user already exists
     const existingUser = await client.user.findFirst({
       where: {
@@ -86,11 +88,11 @@ export class AuthService {
   static async login(data: LoginRequest) {
     let user;
     if (data.email) {
-      user = await client.user.findFirst({
+      user = await client.user.findUnique({
         where: { email: data.email },
       });
     } else if (data.username) {
-      user = await client.user.findFirst({
+      user = await client.user.findUnique({
         where: { username: data.username },
       });
     }
@@ -100,10 +102,7 @@ export class AuthService {
     }
 
     // Verify password
-    const isPasswordValid = await bcrypt.compare(
-      data.password,
-      user.password,
-    );
+    const isPasswordValid = await bcrypt.compare(data.password, user.password);
     if (!isPasswordValid) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
@@ -179,7 +178,9 @@ export class AuthService {
 
       const user = await client.user.findUnique({
         where: { id: payload.userId },
+        select: { id: true ,refreshToken:true},
       });
+      console.log(user,refreshToken)
 
       if (!user || user.refreshToken !== refreshToken) {
         throw new ApiError(HttpStatus.UNAUTHORIZED, "Invalid refresh token");
@@ -195,7 +196,10 @@ export class AuthService {
 
       return { accessToken: tokens.accessToken };
     } catch (error) {
-      throw new ApiError(HttpStatus.UNAUTHORIZED, "Invalid refresh token");
+      throw new ApiError(
+        HttpStatus.UNAUTHORIZED,
+        "Invalid refresh token",
+      );
     }
   }
 
@@ -271,10 +275,11 @@ export class AuthService {
   private static async sendResetEmail(email: string, resetUrl: string) {
     try {
       const transporter = nodemailer.createTransport({
-        service: "gmail", // You can configure this in env
+        host: "smtp.ethereal.email",
+        port: 587,
         auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASSWORD,
+          user: EnvVariables.EMAIL_USER,
+          pass: EnvVariables.EMAIL_PASSWORD,
         },
       });
 

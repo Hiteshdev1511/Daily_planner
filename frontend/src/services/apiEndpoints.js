@@ -1,16 +1,15 @@
 import api from "./api";
 
 export const authAPI = {
-  register: (data) => api.post("/auth/register", data),
-  login: (data) => api.post("/auth/login", data),
+  register: (payload) => api.post("/auth/register", payload),
+  login: (payload) => api.post("/auth/login", payload),
   logout: () => api.post("/auth/logout"),
-  changePassword: (data) => api.post("/auth/change-password", data),
-  forgotPassword: (email) => api.post("/auth/forgot-password", { email }),
-  resetPassword: (token, newPassword) =>
-    api.post("/auth/reset-password", { token, newPassword }),
+  changePassword: (payload) => api.post("/auth/change-password", payload),
+  forgotPassword: (payload) => api.post("/auth/forgot-password", payload),
+  resetPassword: (payload) => api.post("/auth/reset-password", payload),
   refreshToken: () => api.post("/auth/refresh-token"),
-  checkUsernameUnique: (username) =>
-    api.get(`/auth/check-username?username=${username}`),
+  checkUsernameUnique: (payload) =>
+    api.get(`/auth/check-username?username=${payload}`),
 };
 
 export const userAPI = {
@@ -20,37 +19,28 @@ export const userAPI = {
 
 export const projectAPI = {
   getProjects: () => api.get("/projects"),
-  getProject: (projectId) => api.get(`/projects/${projectId}`),
   createProject: (data) => api.post("/projects", data),
-  updateProject: (projectId, data) => api.put(`/projects/${projectId}`, data),
   deleteProject: (projectId) => api.delete(`/projects/${projectId}`),
 };
 
 export const todoAPI = {
-  getTodos: (projectId) => api.get(`/projects/${projectId}/todos`),
-  getTodo: (projectId, todoId) =>
-    api.get(`/projects/${projectId}/todos/${todoId}`),
-  createTodo: (projectId, data) =>
-    api.post(`/projects/${projectId}/todos`, data),
-  updateTodo: (projectId, todoId, data) =>
-    api.put(`/projects/${projectId}/todos/${todoId}`, data),
-  toggleTodo: (projectId, todoId) =>
-    api.patch(`/projects/${projectId}/todos/${todoId}/toggle`),
-  changeDeadline: (projectId, todoId, deadline) =>
-    api.patch(`/projects/${projectId}/todos/${todoId}/deadline`, { deadline }),
-  deleteTodo: (projectId, todoId) =>
-    api.delete(`/projects/${projectId}/todos/${todoId}`),
+  getTodos: () => api.get(`/todos`),
+  createTodo: (projectId, data) => api.post(`/todos/${projectId}`, data),
+  updateTodo: (todoId, data) => api.patch(`/todos/${todoId}`, data),
+  completeTodo: (todoId) => api.patch(`todos/${todoId}/complete`),
+  changeDeadline: (todoId, deadline) =>
+    api.patch(`/todos/${todoId}/deadline`, { deadline }),
+  deleteTodo: (todoId) => api.delete(`/todos/${todoId}`),
 };
 
 export const collaboratorAPI = {
-  getCollaborators: (projectId) =>
-    api.get(`/projects/${projectId}/collaborators`),
+  getCollaborators: (projectId) => api.get(`/projects/${projectId}`),
   addCollaborator: (projectId, data) =>
-    api.post(`/projects/${projectId}/collaborators`, data),
+    api.post(`/projects/${projectId}`, data),
   updateCollaboratorRole: (projectId, collaboratorId, role) =>
-    api.patch(`/projects/${projectId}/collaborators/${collaboratorId}`, {
+    api.patch(`/projects/${projectId}/${collaboratorId}`, {
       role,
     }),
   removeCollaborator: (projectId, collaboratorId) =>
-    api.delete(`/projects/${projectId}/collaborators/${collaboratorId}`),
+    api.delete(`/projects/${projectId}/${collaboratorId}`),
 };

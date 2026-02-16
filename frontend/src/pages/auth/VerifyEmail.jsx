@@ -1,3 +1,5 @@
+// Todo : To implement
+
 import { useSelector } from "react-redux";
 import { Logo } from "../../components";
 import { useRef, useState } from "react";
@@ -7,9 +9,10 @@ function VerifyEmail() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [value, setValue] = useState("");
+  const [verifyEnabled, setVerifyEnabled] = useState(false);
   const inputRef = useRef(null);
 
-  function verifyEmailHandler() {
+  async function verifyEmailHandler() {
     console.log(value);
     console.log(inputRef);
     setLoading(false);
@@ -40,9 +43,9 @@ function VerifyEmail() {
             className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
             ref={inputRef}
             onChange={(e) => {
-              setValue(prev => prev+e.target.value);
+              setValue((prev) => prev + e.target.value);
               inputRef.current = e.target.nextSibling;
-              inputRef.current.focus()
+              inputRef.current.focus();
             }}
           />
           <input
@@ -51,9 +54,9 @@ function VerifyEmail() {
             className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
             ref={inputRef}
             onChange={(e) => {
-              setValue(prev => prev+e.target.value);
+              setValue((prev) => prev + e.target.value);
               inputRef.current = e.target.nextSibling;
-              inputRef.current.focus()
+              inputRef.current.focus();
             }}
           />
           <input
@@ -62,9 +65,9 @@ function VerifyEmail() {
             className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
             ref={inputRef}
             onChange={(e) => {
-              setValue(prev => prev+e.target.value);
+              setValue((prev) => prev + e.target.value);
               inputRef.current = e.target.nextSibling;
-              inputRef.current.focus()
+              inputRef.current.focus();
             }}
           />
           <input
@@ -73,9 +76,9 @@ function VerifyEmail() {
             className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
             ref={inputRef}
             onChange={(e) => {
-              setValue(prev => prev+e.target.value);
+              setValue((prev) => prev + e.target.value);
               inputRef.current = e.target.nextSibling;
-              inputRef.current.focus()
+              inputRef.current.focus();
             }}
           />
           <input
@@ -84,9 +87,9 @@ function VerifyEmail() {
             className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
             ref={inputRef}
             onChange={(e) => {
-              setValue(prev => prev+e.target.value);
+              setValue((prev) => prev + e.target.value);
               inputRef.current = e.target.nextSibling;
-              inputRef.current.focus()
+              inputRef.current.focus();
             }}
           />
           <input
@@ -95,14 +98,14 @@ function VerifyEmail() {
             className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
             ref={inputRef}
             onChange={(e) => {
-              setValue(prev => prev+e.target.value);
+              setValue((prev) => prev + e.target.value);
             }}
           />
-          
         </div>
 
         <button
           onClick={verifyEmailHandler}
+          disabled={verifyEnabled}
           className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-3 px-6 rounded-md w-full transition text-lg cursor-pointer"
         >
           Verify

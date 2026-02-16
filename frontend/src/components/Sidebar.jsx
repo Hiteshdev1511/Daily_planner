@@ -15,16 +15,27 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import InputTodo from "./InputTodo";
 import { useDetectOutsideClick } from "../hooks/useDetectOutsideClick";
-import { createProject } from "../features/project/projectSlice";
-import { logoutUser } from "../features/user/userSlice";
+import { createProject, fetchProjects } from "../features/project/projectSlice";
+import { useLogoutMutation } from "../features/auth/authApiSlice";
 
 function NavLink({ icon, text, count, to = "" }) {
   const navigate = useNavigate();
+// ... (rest of NavLink)
+
+// ... (PD: NavButtons and Projects components remain unchanged, skipping them in replacement contextual match if possible, 
+// but since I need to import useLogoutMutation at top, and use it in SidebarHeader, I will target specific blocks.)
+// Actually, I can just replace the top imports and the SidebarHeader component logout logic.
+
+// Let's do imports first in a separate block? No, I can do it in one go if I'm careful or multiple replace_file_content calls.
+// I'll do multiple replacements for safety.
+
+// This tool call is just for imports.
+
   return (
     <li
       onClick={() => {
@@ -43,6 +54,8 @@ function NavLink({ icon, text, count, to = "" }) {
 }
 
 function NavButtons() {
+  const { todos } = useSelector((state) => state.todo);
+
   return (
     <nav>
       <ul className="space-y-1">
@@ -53,13 +66,17 @@ function NavButtons() {
         <NavLink
           icon={<Inbox className="w-5 h-5 text-gray-500" />}
           text="Inbox"
-          count={3}
+          count={todos?.filter((todo) => todo.isCompleted === false).length}
           to="inbox"
         />
         <NavLink
           icon={<Calendar className="w-5 h-5 text-gray-500" />}
           text="Today"
-          count={1}
+          count={
+            todos?.filter(
+              (todo) => todo.deadline === new Date().toISOString().slice(0, 10),
+            ).length
+          }
           to="today"
         />
         <NavLink
@@ -85,15 +102,23 @@ function Projects() {
   const navigate = useNavigate();
   const [showAddProject, setShowAddProject] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
-  const { projects } = useSelector((state) => state.project);
+  const { projects, status } = useSelector((state) => state.project);
   const dispatch = useDispatch();
   const newProjRef = useRef(null);
 
   useDetectOutsideClick(newProjRef, () => setShowAddProject(false));
 
+  // Fetch projects on mount if not already loaded
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchProjects());
+    }
+  }, [status, dispatch]);
+
   function submitProjectHandler() {
     if (!newProjectName || newProjectName.trim() === "") return;
     dispatch(createProject({ title: newProjectName }));
+    setNewProjectName("");
     setShowAddProject(false);
   }
 
@@ -119,7 +144,7 @@ function Projects() {
           />
           {showAddProject && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-              <div 
+              <div
                 ref={newProjRef}
                 className="bg-white shadow-xl w-80 p-4 flex flex-col rounded-xl"
                 onClick={(e) => e.stopPropagation()}
@@ -132,8 +157,8 @@ function Projects() {
                   autoFocus
                   className="outline-none mb-4 border border-gray-300 rounded p-2 focus:border-blue-500 transition-colors w-full"
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') submitProjectHandler();
-                    if (e.key === 'Escape') setShowAddProject(false);
+                    if (e.key === "Enter") submitProjectHandler();
+                    if (e.key === "Escape") setShowAddProject(false);
                   }}
                 />
                 <div className="flex items-center justify-end space-x-3">
@@ -157,10 +182,10 @@ function Projects() {
         </div>
       </div>
       <ul>
-        {projects.map((project) => (
+        {projects?.map((project) => (
           <li
-            key={project._id || project.id}
-            onClick={() => navigate(`projects/${project._id || project.id}`)}
+            key={project.id || project.id}
+            onClick={() => navigate(`projects/${project.title}`)}
             className="flex items-center p-2 rounded-md text-orange-800 cursor-pointer text-sm hover:bg-blue-100"
           >
             <span className="font-bold">
@@ -179,10 +204,37 @@ function Projects() {
 function SidebarHeader() {
   const userProfileRef = useRef();
   const { user } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // Keep dispatch if needed elsewhere or remove if unused. 
+  // It is used in Projects component probably? No, this is SidebarHeader.
+  // SidebarHeader doesn't seem to use dispatch other than for logout.
+  // But wait, the previous code had `dispatch(logoutUser())`.
+  
+  const [logout] = useLogoutMutation();
+  const navigate = useNavigate();
+
   const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
   useDetectOutsideClick(userProfileRef, () => setIsUserProfileOpen(false));
+
   const userInitials = user?.username?.charAt(0).toUpperCase() || "U";
+  const isLoading = !user;
+
+  async function handleLogout() {
+      try {
+          await logout().unwrap();
+          navigate("/auth/login");
+      } catch (error) {
+          console.error("Logout failed:", error);
+      }
+  }
+
+  if (isLoading) {
+    return (
+      <header className="flex justify-between items-center p-3 border-b border-gray-200 relative top-1">
+        <div className="text-sm text-gray-500">Loading...</div>
+      </header>
+    );
+  }
+
   return (
     <header
       ref={userProfileRef}
@@ -198,7 +250,9 @@ function SidebarHeader() {
         <div className="flex items-center justify-center h-7 w-7 bg-red-600 rounded-full text-white text-sm font-bold">
           {userInitials}
         </div>
-        <span className="font-semibold text-sm">{user.username}</span>
+        <span className="font-semibold text-sm">
+          {user?.username || "User"}
+        </span>
         <ChevronsUpDown className="w-4 h-4 text-gray-500" />
       </div>
       {isUserProfileOpen && (
@@ -210,25 +264,27 @@ function SidebarHeader() {
               </div>
               <div>
                 <div className="flex flex-col">
-                  <span className="font-bold">{user?.fullName}</span>
-                  <span className="text-sm">{user?.role}</span>
+                  <span className="font-bold">{user?.fullName || "N/A"}</span>
+                  <span className="text-sm">{user?.role || "User"}</span>
                 </div>
-                <span className="text-sm">{user?.email}</span>
+                <span className="text-sm">{user?.email || "N/A"}</span>
               </div>
             </div>
             <div className="border-b-1 border-gray-200 h-15 flex flex-col justify-around text-gray-600">
               <div className="flex items-center hover:bg-gray-100 hover:rounded pl-2">
                 <Settings size="20" /> <span className="ml-1">Settings</span>
               </div>
-              <div 
+              <div
                 className="flex items-center hover:bg-gray-100 hover:rounded pl-2 cursor-pointer"
-                onClick={() => dispatch(logoutUser())}
+                onClick={handleLogout}
               >
                 <LogOut size="20" /> <span className="ml-1">Logout</span>
               </div>
             </div>
             <div>
-              <span>{user.lastLoggedIn}</span>
+              <span className="text-sm text-gray-600">
+                {user?.lastLoggedIn || "N/A"}
+              </span>
             </div>
           </div>
         </div>

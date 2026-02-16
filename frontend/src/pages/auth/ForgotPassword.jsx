@@ -17,7 +17,10 @@ function ForgotPassword() {
     e.preventDefault();
     setSubmitted(true);
 
-    if (!email) {
+    if (
+      !email.trim() ||
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
+    ) {
       return;
     }
 
@@ -25,7 +28,7 @@ function ForgotPassword() {
       setIsSubmitting(true);
       setError(null);
 
-      await authAPI.forgotPassword(email);
+      await authAPI.forgotPassword({email});
       setSuccess(true);
 
       setTimeout(() => {
@@ -74,8 +77,8 @@ function ForgotPassword() {
                   className="space-y-4 md:space-y-6"
                 >
                   <p className="text-sm text-gray-600">
-                    Enter your email address and we'll send you a link to reset
-                    your password.
+                    Enter your email address and we&apos;ll send you a link to
+                    reset your password.
                   </p>
 
                   <div>
@@ -116,7 +119,7 @@ function ForgotPassword() {
                     <p className="text-sm text-gray-600">
                       Remember your password?{" "}
                       <a
-                        href="/login"
+                        href="/auth/login"
                         className="text-blue-600 hover:underline font-semibold"
                       >
                         Back to Login
@@ -130,7 +133,7 @@ function ForgotPassword() {
                 <div className="text-center">
                   <p className="text-sm text-gray-600">
                     <a
-                      href="/login"
+                      href="/auth/login"
                       className="text-blue-600 hover:underline font-semibold"
                     >
                       Back to Login
